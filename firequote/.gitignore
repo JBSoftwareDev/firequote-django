@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtualenv
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Mac/Windows
+.DS_Store
+Thumbs.db
+
+# Byte-compiled
+pip-wheel-metadata/
+*.egg-info/
+
+# Coverage
+htmlcov/
+
+# Secrets / env
+.env
+.env.*
+
+# Do NOT ignore your templates with placeholders (we want them in repo)
+# quotes/templates_docs/   <-- KEEP this folder tracked (remove comment if you want)

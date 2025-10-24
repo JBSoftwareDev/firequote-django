@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Cotización</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .section { margin-bottom: 20px; }
+        label { display: inline-block; width: 200px; }
+        button { padding: 8px 16px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<h1>Generar Cotización</h1>
+<form method="POST">
+    {% csrf_token %}
+    <div class="section">
+        <h2>Cliente</h2>
+
+        <p><strong>Cliente existente:</strong></p>
+        <select name="existing_client" id="existing_client">
+            <option value="">-- Selecciona un cliente existente --</option>
+            {% for c in clients %}
+            <option value="{{ c.id }}">{{ c.full_name }} — {{ c.company }}</option>
+            {% endfor %}
+        </select>
+
+        <hr style="margin: 20px 0;">
+
+        <p><strong>O crear un nuevo cliente:</strong></p>
+        <label for="new_client_title">Título:</label>
+        <select name="new_client_title" id="new_client_title">
+            <option value="">-- Selecciona --</option>
+            <option value="ingeniero">Ingeniero</option>
+            <option value="ingeniera">Ingeniera</option>
+            <option value="arquitecto">Arquitecto</option>
+            <option value="arquitecta">Arquitecta</option>
+            <option value="senior">Señor</option>
+            <option value="seniora">Señora</option>
+        </select><br><br>
+
+        <label for="new_client_name">Nombre completo:</label>
+        <input type="text" name="new_client_name" id="new_client_name"><br><br>
+
+        <label for="new_client_position">Cargo:</label>
+        <input type="text" name="new_client_position" id="new_client_position"><br><br>
+
+        <label for="new_client_company">Empresa:</label>
+        <input type="text" name="new_client_company" id="new_client_company"><br><br>
+
+        <label for="new_client_city">Ciudad:</label>
+        <input type="text" name="new_client_city" id="new_client_city"><br><br>
+
+        <label for="new_client_email">Correo:</label>
+        <input type="email" name="new_client_email" id="new_client_email"><br><br>
+
+        <label for="new_client_phone">Teléfono:</label>
+        <input type="text" name="new_client_phone" id="new_client_phone">
+    </div>
+
+
+    <div class="section">
+        <label for="project_name">Nombre del proyecto:</label>
+        <input type="text" name="project_name" id="project_name" required>
+    </div>
+
+    <div class="section">
+        <label for="area_sqm">Área (m²):</label>
+        <input type="number" name="area_sqm" id="area_sqm" min="0" step="0.01">
+    </div>
+
+    <div class="section">
+        <label>Tipo de construcción:</label>
+        <input type="radio" name="building_type" value="residential"> Residencial
+        <input type="radio" name="building_type" value="commercial"> Comercial
+    </div>
+
+    <div class="section">
+        <label>Servicios:</label><br>
+        <input type="checkbox" name="is_detection" id="is_detection"> Detección
+        <input type="checkbox" name="is_protection" id="is_protection"> Protección
+        <input type="checkbox" name="is_human_safety" id="is_human_safety"> Seguridad Humana
+    </div>
+
+    <div class="section">
+        <label>Formatos de entrega:</label><br>
+        <input type="checkbox" name="deliver_autocad"> Autocad
+        <input type="checkbox" name="deliver_revit"> Revit
+    </div>
+
+    <div class="section">
+        <button type="submit">Generar Cotización</button>
+        <button type="reset">Limpiar</button>
+    </div>
+</form>
+
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li style="color: green;">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+</body>
+</html>

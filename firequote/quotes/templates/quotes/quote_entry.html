@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Cotización</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, button { padding: 8px; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Buscar cotización</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label>ID de la cotización:</label><br>
+        <input type="number" name="quote_id" required><br>
+        <button type="submit">Abrir detalles</button>
+    </form>
+</body>
+</html>
