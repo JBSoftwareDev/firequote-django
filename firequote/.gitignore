@@ -1,40 +1,37 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.pyo
-*.pyd
 
-# Virtualenv
-.venv/
+# Environment
+.env
+.env.* 
 venv/
-env/
-ENV/
+.venv/
+*.venv
+.Pipfile.lock
 
 # Django
-*.sqlite3
 db.sqlite3
-media/
+/media/
 staticfiles/
+generated_docs/
+templates_docs/uploads/
 *.log
 
-# VSCode / IDE
-.vscode/
+# PyCharm / VSCode
 .idea/
+.vscode/
 
-# Mac/Windows
+# System
 .DS_Store
 Thumbs.db
 
-# Byte-compiled
-pip-wheel-metadata/
+# Distribution / packaging
+dist/
+build/
 *.egg-info/
 
-# Coverage
-htmlcov/
-
-# Secrets / env
-.env
-.env.*
-
-# Do NOT ignore your templates with placeholders (we want them in repo)
-# quotes/templates_docs/   <-- KEEP this folder tracked (remove comment if you want)
+# Byte-compiled / caches
+pip-wheel-metadata/

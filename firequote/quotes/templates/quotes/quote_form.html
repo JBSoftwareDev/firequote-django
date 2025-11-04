@@ -1,106 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Bootstrap 5.3.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <meta charset="UTF-8">
     <title>Generar Cotización</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        .section { margin-bottom: 20px; }
-        label { display: inline-block; width: 200px; }
-        button { padding: 8px 16px; margin-top: 10px; }
+        body { background-color: #f8f9fa; }
+        .card { margin-bottom: 20px; border-radius: 10px; }
+        .form-section { margin-top: 25px; }
+        h1, h2, h3 { color: #0d6efd; }
+        textarea { resize: vertical; }
     </style>
+
 </head>
-<body>
-<h1>Generar Cotización</h1>
-<form method="POST">
-    {% csrf_token %}
-    <div class="section">
-        <h2>Cliente</h2>
+<body class="container py-4">
 
-        <p><strong>Cliente existente:</strong></p>
-        <select name="existing_client" id="existing_client">
-            <option value="">-- Selecciona un cliente existente --</option>
-            {% for c in clients %}
-            <option value="{{ c.id }}">{{ c.full_name }} — {{ c.company }}</option>
-            {% endfor %}
-        </select>
+    <h1 class="text-center mb-4">Generar Cotización</h1>
 
-        <hr style="margin: 20px 0;">
+    <form method="POST" class="card shadow p-4">
+        {% csrf_token %}
 
-        <p><strong>O crear un nuevo cliente:</strong></p>
-        <label for="new_client_title">Título:</label>
-        <select name="new_client_title" id="new_client_title">
-            <option value="">-- Selecciona --</option>
-            <option value="ingeniero">Ingeniero</option>
-            <option value="ingeniera">Ingeniera</option>
-            <option value="arquitecto">Arquitecto</option>
-            <option value="arquitecta">Arquitecta</option>
-            <option value="senior">Señor</option>
-            <option value="seniora">Señora</option>
-        </select><br><br>
+        <!-- Cliente -->
+        <div class="form-section">
+            <h3>Cliente</h3>
+            <div class="mb-3">
+                <label class="form-label">Cliente existente:</label>
+                <select name="existing_client" id="existing_client" class="form-select">
+                    <option value="">-- Selecciona un cliente existente --</option>
+                    {% for c in clients %}
+                    <option value="{{ c.id }}">{{ c.full_name }} — {{ c.company }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label for="new_client_name">Nombre completo:</label>
-        <input type="text" name="new_client_name" id="new_client_name"><br><br>
+            <hr>
 
-        <label for="new_client_position">Cargo:</label>
-        <input type="text" name="new_client_position" id="new_client_position"><br><br>
+            <h5>O crear un nuevo cliente:</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Título</label>
+                    <select name="new_client_title" class="form-select">
+                        <option value="">-- Selecciona --</option>
+                        <option value="ingeniero">Ingeniero</option>
+                        <option value="ingeniera">Ingeniera</option>
+                        <option value="arquitecto">Arquitecto</option>
+                        <option value="arquitecta">Arquitecta</option>
+                        <option value="senior">Señor</option>
+                        <option value="seniora">Señora</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Nombre completo</label>
+                    <input type="text" name="new_client_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cargo</label>
+                    <input type="text" name="new_client_position" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Empresa</label>
+                    <input type="text" name="new_client_company" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ciudad</label>
+                    <input type="text" name="new_client_city" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" name="new_client_email" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" name="new_client_phone" class="form-control">
+                </div>
+            </div>
+        </div>
 
-        <label for="new_client_company">Empresa:</label>
-        <input type="text" name="new_client_company" id="new_client_company"><br><br>
+        <!-- Proyecto -->
+        <div class="form-section">
+            <h3>Proyecto</h3>
+            <div class="mb-3">
+                <label class="form-label">Nombre del proyecto</label>
+                <input type="text" name="project_name" class="form-control" required>
+            </div>
+        </div>
 
-        <label for="new_client_city">Ciudad:</label>
-        <input type="text" name="new_client_city" id="new_client_city"><br><br>
+        <div class="mb-4">
+            <label class="form-label d-block">Tipo de construcción</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="building_type" id="building_residential" value="residential"
+                       {% if quote.building_type == "residential" %}checked{% endif %}>
+                <label class="form-check-label" for="building_residential">Residencial</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="building_type" id="building_commercial" value="commercial"
+                       {% if quote.building_type == "commercial" %}checked{% endif %}>
+                <label class="form-check-label" for="building_commercial">Comercial</label>
+            </div>
+        </div>
 
-        <label for="new_client_email">Correo:</label>
-        <input type="email" name="new_client_email" id="new_client_email"><br><br>
 
-        <label for="new_client_phone">Teléfono:</label>
-        <input type="text" name="new_client_phone" id="new_client_phone">
+        <!-- Servicios -->
+        <div class="form-section">
+            <h3>Servicios</h3>
+            <div class="form-check">
+                <input type="checkbox" name="is_detection" class="form-check-input" id="is_detection">
+                <label class="form-check-label" for="is_detection">Detección</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="is_protection" class="form-check-input" id="is_protection">
+                <label class="form-check-label" for="is_protection">Protección</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="is_human_safety" class="form-check-input" id="is_human_safety">
+                <label class="form-check-label" for="is_human_safety">Seguridad Humana</label>
+            </div>
+        </div>
+
+        <!-- Formatos -->
+        <div class="form-section">
+            <h3>Formatos de entrega</h3>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" name="deliver_autocad" class="form-check-input" id="deliver_autocad">
+                <label class="form-check-label" for="deliver_autocad">Autocad</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" name="deliver_revit" class="form-check-input" id="deliver_revit">
+                <label class="form-check-label" for="deliver_revit">Revit</label>
+            </div>
+        </div>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">Generar Cotización</button>
+            <button type="reset" class="btn btn-secondary">Limpiar</button>
+        </div>
+    </form>
+
+    {% if messages %}
+    <div class="alert alert-info mt-4">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }}</p>
+        {% endfor %}
     </div>
+    {% endif %}
 
-
-    <div class="section">
-        <label for="project_name">Nombre del proyecto:</label>
-        <input type="text" name="project_name" id="project_name" required>
-    </div>
-
-    <div class="section">
-        <label for="area_sqm">Área (m²):</label>
-        <input type="number" name="area_sqm" id="area_sqm" min="0" step="0.01">
-    </div>
-
-    <div class="section">
-        <label>Tipo de construcción:</label>
-        <input type="radio" name="building_type" value="residential"> Residencial
-        <input type="radio" name="building_type" value="commercial"> Comercial
-    </div>
-
-    <div class="section">
-        <label>Servicios:</label><br>
-        <input type="checkbox" name="is_detection" id="is_detection"> Detección
-        <input type="checkbox" name="is_protection" id="is_protection"> Protección
-        <input type="checkbox" name="is_human_safety" id="is_human_safety"> Seguridad Humana
-    </div>
-
-    <div class="section">
-        <label>Formatos de entrega:</label><br>
-        <input type="checkbox" name="deliver_autocad"> Autocad
-        <input type="checkbox" name="deliver_revit"> Revit
-    </div>
-
-    <div class="section">
-        <button type="submit">Generar Cotización</button>
-        <button type="reset">Limpiar</button>
-    </div>
-</form>
-
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li style="color: green;">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
 </body>
-</html>

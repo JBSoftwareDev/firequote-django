@@ -2,15 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Bootstrap 5.3.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <title>Detalles de Cotización</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        .section { margin-bottom: 20px; }
-        textarea { width: 100%; height: 100px; margin-top: 5px; }
-        label { display: inline-block; margin-bottom: 5px; }
-        button { padding: 10px 20px; margin-top: 20px; }
+        body { background-color: #f8f9fa; }
+        .card { margin-bottom: 20px; border-radius: 10px; }
+        .form-section { margin-top: 25px; }
+        h1, h2, h3 { color: #0d6efd; }
+        textarea { resize: vertical; }
     </style>
+
 
     <script>
         // Función para mostrar u ocultar áreas de texto
@@ -31,134 +34,152 @@
     </script>
 </head>
 
-<body>
-<h1>Detalles de Cotización</h1>
+<body class="container py-4">
 
-<form method="POST" action="{% url 'quote_details' quote.id %}">
-    {% csrf_token %}
+    <h1 class="text-center mb-4">Detalles de Cotización</h1>
 
-    <div class="section">
-        <h2>Cliente: {{ quote.client.full_name }}</h2>
-        <p><strong>Proyecto:</strong> {{ quote.project_name }}</p>
-    </div>
+    <form method="POST" action="{% url 'quote_details' quote.id %}" class="card shadow p-4">
+        {% csrf_token %}
 
-    <hr>
+        <div class="mb-4">
+            <h4>Cliente: <span class="text-primary">{{ quote.client.full_name }}</span></h4>
+            <p><strong>Proyecto:</strong> {{ quote.project_name }}</p>
+        </div>
 
-    <div class="section">
-        <h3>Requerimientos adicionales del cliente</h3>
-        <input type="checkbox" id="add_requirements" onclick="toggleTextarea('add_requirements','manual_requirements')">
-        <label for="add_requirements">Agregar requerimientos manualmente</label><br>
-        <textarea id="manual_requirements" name="manual_requirements" placeholder="Escribe aquí los requerimientos adicionales..." disabled></textarea>
-    </div>
+        <div class="form-section">
+            <h5>Requerimientos adicionales</h5>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="add_requirements" class="form-check-input" onclick="toggleTextarea('add_requirements','manual_requirements')">
+                <label class="form-check-label" for="add_requirements">Agregar requerimientos manualmente</label>
+            </div>
+            <textarea id="manual_requirements" name="manual_requirements" class="form-control" placeholder="Escribe los requerimientos adicionales..." disabled></textarea>
+        </div>
 
-    {% if quote.is_human_safety %}
-    <div class="section">
-        <h3>Seguridad Humana</h3>
-        <input type="checkbox" id="add_sh" onclick="toggleTextarea('add_sh','manual_items_sh')">
-        <label for="add_sh">Agregar ítems manualmente (Seguridad Humana)</label><br>
-        <textarea id="manual_items_sh" name="manual_items_sh" placeholder="Escribe aquí los ítems adicionales de Seguridad Humana..." disabled></textarea>
-        <br>
-    </div>
-    {% endif %}
+        {% if quote.is_detection or quote.is_protection or quote.is_human_safety %}
+        <hr>
+        {% endif %}
 
-    {% if quote.is_detection %}
-    <div class="section">
-        <h3>Detección de incendios</h3>
-        <input type="checkbox" id="add_detection" onclick="toggleTextarea('add_detection','manual_items_detection')">
-        <label for="add_detection">Agregar ítems manualmente (Detección de incendios)</label><br>
-        <textarea id="manual_items_detection" name="manual_items_detection" placeholder="Escribe aquí los ítems adicionales de Detección..." disabled></textarea>
-        <br>
-    </div>
-    {% endif %}
+        {% if quote.is_detection %}
+        <div class="form-section">
+            <h5>Detección de incendios</h5>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="add_detection" class="form-check-input" onclick="toggleTextarea('add_detection','manual_items_detection')">
+                <label class="form-check-label" for="add_detection">Agregar ítems manualmente</label>
+            </div>
+            <textarea id="manual_items_detection" name="manual_items_detection" class="form-control" placeholder="Ítems adicionales de detección..." disabled></textarea>
+        </div>
+        {% endif %}
 
-    {% if quote.is_protection %}
-    <div class="section">
-        <h3>Protección contra incendios</h3>
-        <input type="checkbox" id="add_protection" onclick="toggleTextarea('add_protection','manual_items_protection')">
-        <label for="add_protection">Agregar ítems manualmente (Protección)</label><br>
-        <textarea id="manual_items_protection" name="manual_items_protection" placeholder="Escribe aquí los ítems adicionales de Protección..." disabled></textarea>
-        <br>
-    </div>
-    {% endif %}
+        {% if quote.is_protection %}
+        <div class="form-section">
+            <h5>Protección contra incendios</h5>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="add_protection" class="form-check-input" onclick="toggleTextarea('add_protection','manual_items_protection')">
+                <label class="form-check-label" for="add_protection">Agregar ítems manualmente</label>
+            </div>
+            <textarea id="manual_items_protection" name="manual_items_protection" class="form-control" placeholder="Ítems adicionales de protección..." disabled></textarea>
+        </div>
+        {% endif %}
 
-    <div class="section">
-        <h3>Formatos de entrega</h3>
-        <input type="checkbox" name="deliver_autocad" id="deliver_autocad" {% if quote.deliver_autocad %}checked{% endif %}>
-        <label for="deliver_autocad">Autocad</label>
-        <input type="checkbox" name="deliver_revit" id="deliver_revit" {% if quote.deliver_revit %}checked{% endif %}>
-        <label for="deliver_revit">Revit</label>
-    </div>
-    <hr>
+        {% if quote.is_human_safety %}
+        <div class="form-section">
+            <h5>Seguridad Humana</h5>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="add_sh" class="form-check-input" onclick="toggleTextarea('add_sh','manual_items_sh')">
+                <label class="form-check-label" for="add_sh">Agregar ítems manualmente</label>
+            </div>
+            <textarea id="manual_items_sh" name="manual_items_sh" class="form-control" placeholder="Ítems adicionales de seguridad humana..." disabled></textarea>
+        </div>
+        {% endif %}
 
-    <div class="section">
-        <h3>Forma de pago</h3>
-        <label>Anticipo (%):</label>
-        <input type="number" name="payment_advance" value="{{ quote.payment_advance }}"><br><br>
+        <hr>
 
-        <label>Primera versión (%):</label>
-        <input type="number" name="payment_first_version" value="{{ quote.payment_first_version }}"><br><br>
+        <div class="form-section">
+            <h5>Forma de pago</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Anticipo (%)</label>
+                    <input type="number" name="payment_advance" value="{{ quote.payment_advance }}" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Primera versión (%)</label>
+                    <input type="number" name="payment_first_version" value="{{ quote.payment_first_version }}" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Entrega final (%)</label>
+                    <input type="number" name="payment_final" value="{{ quote.payment_final }}" class="form-control">
+                </div>
+            </div>
+        </div>
 
-        <label>Entrega final (%):</label>
-        <input type="number" name="payment_final" value="{{ quote.payment_final }}">
-    </div>
+        <hr>
 
-    <div class="section">
-        <h3>Tiempo de entrega</h3>
-        <label>Duración:</label>
-        <input type="number" name="delivery_time_value" value="{{ quote.delivery_time_value }}" min="1">
-        <select name="delivery_time_unit">
-            <option value="days" {% if quote.delivery_time_unit == "days" %}selected{% endif %}>Días</option>
-            <option value="weeks" {% if quote.delivery_time_unit == "weeks" %}selected{% endif %}>Semanas</option>
-            <option value="months" {% if quote.delivery_time_unit == "months" %}selected{% endif %}>Meses</option>
-        </select>
-    </div>
+        <div class="form-section">
+            <h5>Notas adicionales</h5>
 
-    <div class="section">
-        <h3>Notas adicionales</h3>
-        <label for="notes_count">Cantidad de notas:</label>
-        <select id="notes_count" name="notes_count" onchange="updateNotes(this.value)">
-            <option value="0">0</option>
-            {% for i in notes_range %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
-        </select>
+            <!-- Checkbox para activar las notas -->
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="add_notes" onclick="toggleNotesSection()">
+                <label class="form-check-label" for="add_notes">Agregar notas adicionales</label>
+            </div>
 
-        <div id="notes_container"></div>
+            <!-- Contenedor de notas (oculto al inicio) -->
+            <div id="notes_section" style="display: none;">
+                <div class="mb-3">
+                    <label for="notes_count" class="form-label fw-bold">Cantidad de notas:</label>
+                    <select id="notes_count" name="notes_count" class="form-select w-auto d-inline" onchange="updateNotes(this.value)">
+                        <option value="0">0</option>
+                        {% for i in notes_range %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <script>
-            function updateNotes(count) {
-                const container = document.getElementById("notes_container");
-                container.innerHTML = "";
-                for (let i = 1; i <= count; i++) {
-                    container.innerHTML += `<label>Nota ${i}:</label><br><textarea name="note_${i}" placeholder="Escribe aquí la nota ${i}..."></textarea><br>`;
+                <div id="notes_container"></div>
+            </div>
+
+            <script>
+                // Mostrar u ocultar la sección de notas
+                function toggleNotesSection() {
+                    const section = document.getElementById("notes_section");
+                    const checkbox = document.getElementById("add_notes");
+                    section.style.display = checkbox.checked ? "block" : "none";
                 }
-            }
-        </script>
-    </div>
 
-    <div class="section">
-        <h3>Normas aplicables</h3>
-        {% for norm in norms %}
-            <label>
-                <input type="checkbox" name="selected_norms" value="{{ norm.id }}"
-                {% if norm in quote.norms.all %}checked{% endif %}>
-                {{ norm.code }} — {{ norm.description }}
-            </label><br>
-        {% endfor %}
-    </div>
+                // Generar dinámicamente los textareas según el número elegido
+                function updateNotes(count) {
+                    const container = document.getElementById("notes_container");
+                    container.innerHTML = "";
+                    for (let i = 1; i <= count; i++) {
+                        container.innerHTML += `
+                            <div class="mb-3">
+                                <label for="note_${i}" class="form-label">Nota ${i}:</label>
+                                <textarea name="note_${i}" id="note_${i}" class="form-control" rows="2"
+                                    placeholder="Escribe aquí la nota ${i}..."></textarea>
+                            </div>
+                        `;
+                    }
+                }
+            </script>
+        </div>
 
-    <!-- Selección de servicios reales (para backend) -->
-    <input type="hidden" name="is_detection" value="{{ quote.is_detection|yesno:'true,false' }}">
-    <input type="hidden" name="is_protection" value="{{ quote.is_protection|yesno:'true,false' }}">
-    <input type="hidden" name="is_human_safety" value="{{ quote.is_human_safety|yesno:'true,false' }}">
+        <div class="form-section">
+            <h5>Normas aplicables</h5>
+            <div class="row">
+                {% for norm in norms %}
+                <div class="col-md-6 mb-2">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="selected_norms" value="{{ norm.id }}"
+                            {% if norm.id in selected_norm_ids %}checked{% elif norm.is_default and not selected_norm_ids %}checked{% endif %}>
+                        <label class="form-check-label">{{ norm.code }} — {{ norm.description }}</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-    <!-- Selección de formatos reales -->
-    <input type="hidden" name="deliver_autocad" value="{{ quote.deliver_autocad|yesno:'true,false' }}">
-    <input type="hidden" name="deliver_revit" value="{{ quote.deliver_revit|yesno:'true,false' }}">
-
-
-    <button type="submit">Generar Documento Final</button>
-</form>
-
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">Generar Documento Final</button>
+        </div>
+    </form>
 </body>
-</html>

@@ -9,7 +9,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 @admin.register(Norm)
 class NormAdmin(admin.ModelAdmin):
-    list_display = ('code', 'default_selected')
+    list_display = ('code', 'is_default', 'description')
     search_fields = ('code',)
 
 @admin.register(TemplateDoc)

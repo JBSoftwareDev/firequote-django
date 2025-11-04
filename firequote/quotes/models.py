@@ -1,7 +1,4 @@
 from django.db import models
-
-# quotes/models.py
-from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 TITLE_CHOICES = [
@@ -22,6 +19,7 @@ BUILDING_TYPE = [
 ]
 
 class Client(models.Model):
+    # Stores client contact and company information.
     title = models.CharField(max_length=20, choices=TITLE_CHOICES, blank=True)
     full_name = models.CharField(max_length=200, blank=True)
     position = models.CharField(max_length=200, blank=True)
@@ -35,25 +33,27 @@ class Client(models.Model):
         return f"{self.full_name} — {self.company}"
 
 class Norm(models.Model):
+    # Stores fire safety norms and their applicable services.
     SERVICE_CHOICES = [
         ('detection', 'Detección de incendios'),
         ('protection', 'Protección contra incendios'),
         ('human_safety', 'Seguridad humana'),
     ]
 
-    code = models.CharField(max_length=50, unique=True)  # e.g., 'NFPA 13'
-    description = models.TextField(blank=True)
-    services = models.JSONField(default=list, blank=True)  # lista de servicios donde aplica
-    default_selected = models.BooleanField(default=False)
+    code = models.CharField(max_length=50, unique=True)  # e.g. "NFPA 13"
+    description = models.TextField(blank=True)  # e.g. "Standard for automatic sprinkler systems"
+    services = models.JSONField(default=list, blank=True)  # Services where the norm applies
+    is_default = models.BooleanField(default=False)  # Used as default in templates
 
     def __str__(self):
-        return self.code
+        return f"{self.code} — {self.description}"
 
 class TemplateDoc(models.Model):
-    name = models.CharField(max_length=200)  # e.g., 'protection_autocad.docx'
+    # Represents a .docx template for specific service and delivery format combinations.
+    name = models.CharField(max_length=200)  # e.g. "protection_autocad.docx"
     file = models.FileField(upload_to='templates_docs/')
-    services_tag = models.CharField(max_length=100)  # e.g., 'protection|detection'
-    formats_tag = models.CharField(max_length=50)    # e.g., 'autocad', 'revit', 'both'
+    services_tag = models.CharField(max_length=100)  # e.g. "protection|detection"
+    formats_tag = models.CharField(max_length=50)  # e.g. "autocad", "revit", "both"
 
     def __str__(self):
         return self.name
@@ -86,23 +86,23 @@ class Quote(models.Model):
     delivery_time_value = models.IntegerField(null=True, blank=True)
     delivery_time_unit = models.CharField(max_length=10, choices=TIME_UNIT_CHOICES, blank=True)
 
-    # Valores de los servicios
+    # Service values
     value_protection = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     value_detection = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     value_human_safety = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_value = models.DecimalField(max_digits=14, decimal_places=2, default=0)
 
-    # Plantilla y doc generado
+    # Related template and generated document
     template_doc = models.ForeignKey(TemplateDoc, on_delete=models.SET_NULL, null=True, blank=True)
     generated_doc = models.FileField(upload_to='generated_quotes/', null=True, blank=True)
 
-    # Nuevo campo opcional para mantener compatibilidad con views.py
+    # Optional field for backward compatibility with views.py
     service_tag = models.CharField(max_length=50, blank=True, null=True)  # <-- agregado
 
-    # Fecha de creación
+    # Creation timestamp
     created_at = models.DateTimeField(auto_now_add=True)  # puedes usar en lugar de quote_date
 
-    norms = models.ManyToManyField(Norm, blank=True)
+    norms = models.ManyToManyField('Norm', blank=True)
 
     def __str__(self):
         return f"{self.client.full_name} - {self.project_name}"
