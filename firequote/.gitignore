@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Environment
+.env
+.env.* 
+venv/
+.venv/
+*.venv
+.Pipfile.lock
+
+# Django
+db.sqlite3
+/media/
+staticfiles/
+generated_docs/
+templates_docs/uploads/
+*.log
+
+# PyCharm / VSCode
+.idea/
+.vscode/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Byte-compiled / caches
+pip-wheel-metadata/
