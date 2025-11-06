@@ -1,18 +1,27 @@
+# ===========================
 # Python
+# ===========================
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyo
+*.pyc
 
-# Environment
+# ===========================
+# Environment / Dependencies
+# ===========================
 .env
-.env.* 
+.env.*
 venv/
 .venv/
 *.venv
-.Pipfile.lock
+Pipfile.lock
+pip-wheel-metadata/
 
+# ===========================
 # Django
+# ===========================
+*.sqlite3
 db.sqlite3
 /media/
 staticfiles/
@@ -20,27 +29,36 @@ generated_docs/
 templates_docs/uploads/
 *.log
 
-# PyCharm / VSCode
+# ===========================
+# IDE / Editor
+# ===========================
 .idea/
 .vscode/
 
+# ===========================
 # System
+# ===========================
 .DS_Store
 Thumbs.db
 
-# Distribution / packaging
+# ===========================
+# Distribution / Packaging
+# ===========================
 dist/
 build/
 *.egg-info/
 
-# Byte-compiled / caches
-pip-wheel-metadata/
-
+# ===========================
+# Generated / Backup Files
+# ===========================
 backup_media_*/
-__pycache__/
-*.pyc
-
 *.docx
+*.tmp
 media/
 generated_docs/
-db.sqlite3
+
+# ===========================
+# Local JSON Data
+# ===========================
+firequote/all_data.json
+firequote/quotes_data.json
