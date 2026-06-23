@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Cotización</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+    <style>
+        .btn-delete {
+            background-color: #b0050f;
+            border-color: #b0050f;
+            color: #ffffff;
+        }
+
+        .btn-delete:hover {
+            background-color: #85040b;
+            border-color: #85040b;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body class="container py-4">
+
+<div class="header-bar">
+    <img src="{% static 'images/logo.png' %}" class="logo">
+
+    <h2 class="header-title">
+        Detalle de Cotización
+    </h2>
+</div>
+
+<div class="card p-4">
+    <p><strong>Proyecto:</strong> {{ quote.project_name }}</p>
+
+    <p>
+        <strong>Cliente:</strong>
+        <a href="{% url 'client_detail' quote.client.id %}">
+            {{ quote.client.full_name }}
+        </a>
+    </p>
+
+    <p><strong>Empresa:</strong> {{ quote.client.company }}</p>
+    <p><strong>Tipo de construcción:</strong> {{ quote.get_building_type_display }}</p>
+
+    {% if quote.deliver_autocad %}
+        <p><strong>Total AutoCAD:</strong> {{ total_autocad }}</p>
+    {% endif %}
+
+    {% if quote.deliver_revit %}
+        <p><strong>Total Revit:</strong> {{ total_revit }}</p>
+    {% endif %}
+
+    <p><strong>Fecha:</strong> {{ quote.created_at|date:"d/m/Y" }}</p>
+
+    <hr>
+
+    <p><strong>Servicios:</strong></p>
+    <ul>
+        {% if quote.is_detection %}<li>Detección</li>{% endif %}
+        {% if quote.is_protection %}<li>Protección</li>{% endif %}
+        {% if quote.is_human_safety %}<li>Seguridad Humana</li>{% endif %}
+    </ul>
+
+    <p><strong>Formatos:</strong></p>
+    <ul>
+        {% if quote.deliver_autocad %}<li>AutoCAD</li>{% endif %}
+        {% if quote.deliver_revit %}<li>Revit</li>{% endif %}
+    </ul>
+
+    <form
+        method="POST"
+        action="{% url 'quote_delete' quote.id %}"
+        class="text-end mt-4"
+        onsubmit="return confirm('¿Seguro que deseas eliminar esta cotización?');">
+
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-delete">
+            Eliminar cotización
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

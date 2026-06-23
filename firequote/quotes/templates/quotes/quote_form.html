@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Cotización</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+    <style>
+        .form-section { margin-top: 25px; }
+
+        .btn-primary:hover {
+            background-color: #b0050f;
+            border-color: #b0050f;
+        }
+
+        .form-check-input:checked {
+            background-color: #e30613;
+            border-color: #e30613;
+        }
+    </style>
+
+</head>
+<body class="container py-4">
+
+    <div class="header-bar d-flex justify-content-between align-items-end">
+        <img src="{% static 'images/logo.png' %}" class="logo">
+
+        <h2 class="header-title text-end">
+            Generar Cotización
+        </h2>
+    </div>
+
+    <form method="POST" class="card shadow p-4">
+        {% csrf_token %}
+
+        <!-- Cliente -->
+        <div class="form-section">
+            <h3>Cliente</h3>
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Cliente existente:
+                </label>
+
+                <select
+                    name="existing_client"
+                    id="existing_client"
+                    class="form-select">
+
+                    <option value="">
+                        -- Selecciona un cliente existente --
+                    </option>
+
+                    {% for c in clients %}
+                    <option
+                        value="{{ c.id }}"
+                        {% if preselected_client_id|stringformat:"s" == c.id|stringformat:"s" %}selected{% endif %}
+                        data-title="{{ c.title }}"
+                        data-name="{{ c.full_name }}"
+                        data-position="{{ c.position }}"
+                        data-company="{{ c.company }}"
+                        data-city="{{ c.city }}"
+                        data-email="{{ c.email }}"
+                        data-phone="{{ c.phone }}">
+
+                        {{ c.get_title_display }}
+                        {{ c.full_name }}
+                        —
+                        {{ c.company }}
+
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- NUEVO BUSCADOR -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Buscar cliente:
+                </label>
+
+                <div class="d-flex">
+
+                    <input
+                        type="text"
+                        id="client_search"
+                        class="form-control me-2"
+                        placeholder="Buscar por nombre o empresa">
+
+                    <button
+                        type="button"
+                        id="search_client_btn"
+                        class="btn btn-primary">
+
+                        Buscar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div
+                id="search_results"
+                class="list-group mb-3">
+
+            </div>
+
+            <hr>
+
+            <h5>Datos cliente:</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Título</label>
+                    <select name="new_client_title" id="new_client_title" class="form-select">
+                        <option value="senor">Señor</option>
+                        <option value="senora">Señora</option>
+                        <option value="ingeniero">Ingeniero</option>
+                        <option value="ingeniera">Ingeniera</option>
+                        <option value="arquitecto">Arquitecto</option>
+                        <option value="arquitecta">Arquitecta</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Nombre completo</label>
+                    <input type="text" name="new_client_name" id="new_client_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cargo</label>
+                    <input type="text" name="new_client_position" id="new_client_position" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Empresa</label>
+                    <input type="text" name="new_client_company" id="new_client_company" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ciudad</label>
+                    <input type="text" name="new_client_city" id="new_client_city" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" name="new_client_email" id="new_client_email" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" name="new_client_phone" id="new_client_phone" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Proyecto -->
+        <div class="form-section">
+            <h3>Proyecto</h3>
+            <div class="mb-3">
+                <label class="form-label">Nombre del proyecto</label>
+                <input type="text" name="project_name" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label d-block">Tipo de construcción</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="building_type" id="building_residential" value="residential" required
+                       {% if quote.building_type == "residential" %}checked{% endif %}>
+                <label class="form-check-label" for="building_residential">Residencial</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="building_type" id="building_commercial" value="commercial" required
+                       {% if quote.building_type == "commercial" %}checked{% endif %}>
+                <label class="form-check-label" for="building_commercial">Comercial</label>
+            </div>
+        </div>
+
+        <div class="mb-4 d-flex align-items-center">
+            <label class="form-label mb-0 me-2">Metros cuadrados</label>
+
+            <input type="number"
+                   name="m2"
+                   step="0.01"
+                   min="0"
+                   class="form-control text-end me-2"
+                   style="max-width: 150px;"
+                   required>
+
+            <span>m²</span>
+        </div>
+
+        <!-- Servicios -->
+        <div class="form-section">
+            <h3>Servicios</h3>
+            <div class="form-check">
+                <input type="checkbox" name="is_detection" class="form-check-input" id="is_detection">
+                <label class="form-check-label" for="is_detection">Detección</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="is_protection" class="form-check-input" id="is_protection">
+                <label class="form-check-label" for="is_protection">Protección</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="is_human_safety" class="form-check-input" id="is_human_safety">
+                <label class="form-check-label" for="is_human_safety">Seguridad Humana</label>
+            </div>
+        </div>
+
+        <!-- Formatos -->
+        <div class="form-section">
+            <h3>Formatos de entrega</h3>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" name="deliver_autocad" class="form-check-input" id="deliver_autocad">
+                <label class="form-check-label" for="deliver_autocad">Autocad</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" name="deliver_revit" class="form-check-input" id="deliver_revit">
+                <label class="form-check-label" for="deliver_revit">Revit</label>
+            </div>
+        </div>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">Generar Cotización</button>
+            <button type="reset" class="btn btn-secondary">Limpiar</button>
+        </div>
+    </form>
+
+    {% if messages %}
+    <div class="alert alert-info mt-4">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+
+    const select =
+    document.getElementById("existing_client");
+
+    function fillClient(selected){
+
+        document.getElementById(
+            "new_client_title"
+        ).value =
+        selected.dataset.title || "";
+
+        document.getElementById(
+            "new_client_name"
+        ).value =
+        selected.dataset.name || "";
+
+        document.getElementById(
+            "new_client_position"
+        ).value =
+        selected.dataset.position || "";
+
+        document.getElementById(
+            "new_client_company"
+        ).value =
+        selected.dataset.company || "";
+
+        document.getElementById(
+            "new_client_city"
+        ).value =
+        selected.dataset.city || "";
+
+        document.getElementById(
+            "new_client_email"
+        ).value =
+        selected.dataset.email || "";
+
+        document.getElementById(
+            "new_client_phone"
+        ).value =
+        selected.dataset.phone || "";
+    }
+
+    select.addEventListener(
+    "change",
+    function(){
+
+    fillClient(
+    this.options[
+    this.selectedIndex
+    ]);
+
+    });
+
+    document
+    .getElementById(
+    "search_client_btn"
+    )
+    .addEventListener(
+    "click",
+    function(){
+
+    const text =
+    document
+    .getElementById(
+    "client_search"
+    )
+    .value
+    .toLowerCase()
+    .trim();
+
+    const results =
+    document
+    .getElementById(
+    "search_results"
+    );
+
+    results.innerHTML="";
+
+    if(!text){
+
+    results.innerHTML=
+    `
+    <div class="text-muted">
+    Escribe algo para buscar
+    </div>
+    `;
+
+    return;
+
+    }
+
+    let found=0;
+
+    Array
+    .from(
+    select.options
+    )
+    .forEach(
+    opt=>{
+
+    if(!opt.value)
+    return;
+
+    const name=
+    (
+    opt.dataset.name
+    ||
+    ""
+    )
+    .toLowerCase();
+
+    const company=
+    (
+    opt.dataset.company
+    ||
+    ""
+    )
+    .toLowerCase();
+
+    const combined =
+    (
+        name +
+        " " +
+        company
+    );
+
+    const searchWords =
+    text
+    .split(/\s+/)
+    .filter(Boolean);
+
+    const matches =
+    searchWords.every(
+        word =>
+        combined.includes(word)
+    );
+
+    if(matches){
+
+    found++;
+
+    const item=
+    document.createElement(
+    "button"
+    );
+
+    item.type=
+    "button";
+
+    item.className=
+    "list-group-item list-group-item-action";
+
+    item.innerHTML=
+    `
+    <strong>
+    ${opt.dataset.name}
+    </strong>
+    <br>
+    ${opt.dataset.company}
+    `;
+
+    item.onclick=
+    function(){
+
+    select.value=
+    opt.value;
+
+    fillClient(
+    opt
+    );
+
+    results.innerHTML=
+    "";
+
+    };
+
+    results.appendChild(
+    item
+    );
+
+    }
+
+    }
+    );
+
+    if(found===0){
+
+    results.innerHTML=
+    `
+    <div class="text-muted">
+    No se encontraron clientes
+    </div>
+    `;
+
+    }
+
+    }
+    );
+
+    document
+.getElementById(
+"client_search"
+)
+.addEventListener(
+"keydown",
+function(event){
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+
+document
+.getElementById(
+"search_client_btn"
+)
+.click();
+
+}
+
+}
+);
+
+window.addEventListener("load", function(){
+
+    if(select.value){
+
+        fillClient(
+            select.options[
+                select.selectedIndex
+            ]
+        );
+
+    }
+
+});
+
+    </script>
+
+</body>

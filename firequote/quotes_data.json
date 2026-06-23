@@ -1,0 +1,1266 @@
+[
+{
+  "model": "quotes.client",
+  "pk": 1,
+  "fields": {
+    "title": "senior",
+    "full_name": "Daniel Fernando Hernandez",
+    "position": "Coordinador de Obra",
+    "company": "Raiz Constructora",
+    "city": "",
+    "email": "coordinadorobra@gruporaiz.com.co",
+    "phone": "3113555383",
+    "created_at": "2025-10-09T13:31:24.226Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 2,
+  "fields": {
+    "title": "senior",
+    "full_name": "Juan Jose Monsalve",
+    "position": "Director Proyectos",
+    "company": "Fire y Equipos",
+    "city": "",
+    "email": "dir.proyectos@goodgroup.com.co",
+    "phone": "3134451063",
+    "created_at": "2025-10-09T14:57:41.449Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 3,
+  "fields": {
+    "title": "senior",
+    "full_name": "Luz Aleidy Cuartas Perez",
+    "position": "",
+    "company": "Vértice",
+    "city": "",
+    "email": "dcv@altosdelaabadia.com",
+    "phone": "321 6438520",
+    "created_at": "2025-10-09T15:23:58.986Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 4,
+  "fields": {
+    "title": "senior",
+    "full_name": "Yuliana Tamayo Zapata",
+    "position": "",
+    "company": "Coninsa",
+    "city": "",
+    "email": "ytamayo@coninsa.co",
+    "phone": "3155264386",
+    "created_at": "2025-10-09T15:24:33.152Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 5,
+  "fields": {
+    "title": "senior",
+    "full_name": "Aurora Rios",
+    "position": "",
+    "company": "SRAIC",
+    "city": "",
+    "email": "proyectos@santiagorojas.com.co",
+    "phone": "3022295772",
+    "created_at": "2025-10-09T15:24:57.235Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 6,
+  "fields": {
+    "title": "senior",
+    "full_name": "Cristiam Gustavo Mondragon",
+    "position": "Director Tecnico",
+    "company": "SPCI",
+    "city": "",
+    "email": "dir.tecnico@spci.com.co",
+    "phone": "3104165783",
+    "created_at": "2025-10-09T15:25:53.368Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 7,
+  "fields": {
+    "title": "senior",
+    "full_name": "Mauricio Guzman",
+    "position": "",
+    "company": "SPCI",
+    "city": "",
+    "email": "mauricio.guzman@spci.com.co",
+    "phone": "3104203649",
+    "created_at": "2025-10-09T15:26:23.118Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 8,
+  "fields": {
+    "title": "senior",
+    "full_name": "David Lopera medina",
+    "position": "",
+    "company": "Socomes",
+    "city": "",
+    "email": "david.lopera@socomes.com",
+    "phone": "3137851941",
+    "created_at": "2025-10-09T15:26:49.086Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 9,
+  "fields": {
+    "title": "senior",
+    "full_name": "Eliana Isabel Cardona Ríos",
+    "position": "",
+    "company": "Ingesed",
+    "city": "",
+    "email": "comercial@ingesed.com",
+    "phone": "3135401714",
+    "created_at": "2025-10-09T15:27:25.276Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 10,
+  "fields": {
+    "title": "senior",
+    "full_name": "Carlos Almanya Patiño",
+    "position": "",
+    "company": "Jomark Seguridad SAS",
+    "city": "",
+    "email": "calmanya@jomarkseguridad.com",
+    "phone": "3194913179",
+    "created_at": "2025-10-09T15:27:49.057Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 11,
+  "fields": {
+    "title": "senior",
+    "full_name": "Gino Alejandro Montoya",
+    "position": "",
+    "company": "ITC Diseños",
+    "city": "",
+    "email": "gino1037@hotmail.com",
+    "phone": "3044003430",
+    "created_at": "2025-10-09T15:29:09.126Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 12,
+  "fields": {
+    "title": "senior",
+    "full_name": "Alejandra Rodriguez Sandoval",
+    "position": "",
+    "company": "OTACC",
+    "city": "",
+    "email": "jrodriguez@otacc.com",
+    "phone": "3107195105",
+    "created_at": "2025-10-09T15:30:14.339Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 13,
+  "fields": {
+    "title": "senior",
+    "full_name": "Eliana Isabel Cardona Ríos",
+    "position": "",
+    "company": "Ingesed",
+    "city": "",
+    "email": "comercial@ingesed.com",
+    "phone": "3135401714",
+    "created_at": "2025-10-09T15:30:39.582Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 14,
+  "fields": {
+    "title": "senior",
+    "full_name": "Humberto Acevedo",
+    "position": "",
+    "company": "Intervé",
+    "city": "",
+    "email": "hacevedo@interve.co",
+    "phone": "3012409366",
+    "created_at": "2025-10-09T15:31:07.204Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 15,
+  "fields": {
+    "title": "senior",
+    "full_name": "Nakary Garcia Romero",
+    "position": "",
+    "company": "Condiseño",
+    "city": "",
+    "email": "n.garcia@condiseno.co",
+    "phone": "3175594091",
+    "created_at": "2025-10-09T15:31:23.660Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 16,
+  "fields": {
+    "title": "senior",
+    "full_name": "Daniel Andrés Restrepo Ríos",
+    "position": "",
+    "company": "RRP",
+    "city": "",
+    "email": "danielrestrepo0804@gmail.com",
+    "phone": "",
+    "created_at": "2025-10-09T15:31:52.988Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 17,
+  "fields": {
+    "title": "senior",
+    "full_name": "Vanessa Zapata",
+    "position": "",
+    "company": "FCR",
+    "city": "",
+    "email": "vanessazapata.fcr@gmail.com",
+    "phone": "310 5304562",
+    "created_at": "2025-10-09T15:39:02.970Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 18,
+  "fields": {
+    "title": "senior",
+    "full_name": "Nakary Garcia Romero",
+    "position": "",
+    "company": "Condiseño",
+    "city": "",
+    "email": "n.garcia@condiseno.co",
+    "phone": "3175594091",
+    "created_at": "2025-10-09T15:39:22.608Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 19,
+  "fields": {
+    "title": "senior",
+    "full_name": "Andrea Núñez",
+    "position": "",
+    "company": "Fire Marshal",
+    "city": "",
+    "email": "andreanunez@firemarshal.com.co",
+    "phone": "3224188478",
+    "created_at": "2025-10-09T15:40:07.837Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 20,
+  "fields": {
+    "title": "senior",
+    "full_name": "Adriana Agudelo López",
+    "position": "",
+    "company": "Conconcreto",
+    "city": "",
+    "email": "aagudelol@conconcreto.com",
+    "phone": "3148721400",
+    "created_at": "2025-10-09T15:40:32.861Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 22,
+  "fields": {
+    "title": "senior",
+    "full_name": "Juan Naranjo",
+    "position": "",
+    "company": "Convel",
+    "city": "",
+    "email": "juannarajo@convel.co",
+    "phone": "3137337587",
+    "created_at": "2025-10-09T15:41:45.079Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 23,
+  "fields": {
+    "title": "senior",
+    "full_name": "Laura Cardona Cardona",
+    "position": "",
+    "company": "Perfek",
+    "city": "",
+    "email": "laura.cardona@perfek.com.co",
+    "phone": "3148600291",
+    "created_at": "2025-10-09T15:42:40.705Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 24,
+  "fields": {
+    "title": "senior",
+    "full_name": "Sebastian Lopez Duque",
+    "position": "",
+    "company": "Proyect & solution",
+    "city": "",
+    "email": "gerencia@projectsolutions.com.co",
+    "phone": "311 3079477",
+    "created_at": "2025-10-09T15:43:16.632Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 25,
+  "fields": {
+    "title": "senior",
+    "full_name": "Sebastian Lopez Duque",
+    "position": "",
+    "company": "Desarrollo urbano Edu",
+    "city": "",
+    "email": "gerencia@projectsolutions.com.co",
+    "phone": "311 3079477",
+    "created_at": "2025-10-09T15:43:30.979Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 26,
+  "fields": {
+    "title": "senior",
+    "full_name": "Mauricio Sepulveda",
+    "position": "",
+    "company": "Desarrollo urbano Edu",
+    "city": "",
+    "email": "",
+    "phone": "3012547727",
+    "created_at": "2025-10-09T15:43:46.515Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 27,
+  "fields": {
+    "title": "senior",
+    "full_name": "Luisa Alarcón",
+    "position": "",
+    "company": "Bitacora ingenieria",
+    "city": "",
+    "email": "luisa.alarcon@bitacoraingenieria.com",
+    "phone": "3006940601",
+    "created_at": "2025-10-09T15:44:15.381Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 28,
+  "fields": {
+    "title": "senior",
+    "full_name": "Robinson Marulanda Guarín",
+    "position": "",
+    "company": "Arquitectura y concreto",
+    "city": "",
+    "email": "robinsonmarulanda@arquitecturayconcreto.com",
+    "phone": "3127218621",
+    "created_at": "2025-10-09T15:44:36.679Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 29,
+  "fields": {
+    "title": "senior",
+    "full_name": "Daniel Bustamante",
+    "position": "Gerente",
+    "company": "Entretangencia",
+    "city": "",
+    "email": "gerencia@entretangencia.com",
+    "phone": "3045239213",
+    "created_at": "2025-10-09T15:44:58.670Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 30,
+  "fields": {
+    "title": "senior",
+    "full_name": "Carlos Henao",
+    "position": "",
+    "company": "Seriinco",
+    "city": "",
+    "email": "carlos.henao@seriinco.com",
+    "phone": "3113391008",
+    "created_at": "2025-10-09T15:45:27.248Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 31,
+  "fields": {
+    "title": "senior",
+    "full_name": "Deisy Duque",
+    "position": "",
+    "company": "Good group",
+    "city": "",
+    "email": "operaciones@goodgroup.com.co",
+    "phone": "3162963854",
+    "created_at": "2025-10-09T15:45:43.891Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 32,
+  "fields": {
+    "title": "senior",
+    "full_name": "Tamara Puerta",
+    "position": "",
+    "company": "FCR",
+    "city": "",
+    "email": "fcrtamarapuerta@gmail.com",
+    "phone": "3014317086",
+    "created_at": "2025-10-09T15:46:14.554Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 33,
+  "fields": {
+    "title": "senior",
+    "full_name": "Laura Delgado",
+    "position": "",
+    "company": "Ingesed",
+    "city": "",
+    "email": "operacionesingesed@gmail.com",
+    "phone": "321 8338189",
+    "created_at": "2025-10-09T15:46:42.239Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 34,
+  "fields": {
+    "title": "senior",
+    "full_name": "Christian Gañan Ibarra",
+    "position": "",
+    "company": "Go ingenieria y soluciones",
+    "city": "",
+    "email": "goingenieriaysoluciones@gmail.com",
+    "phone": "310 5104288",
+    "created_at": "2025-10-09T15:46:57.754Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 35,
+  "fields": {
+    "title": "senior",
+    "full_name": "Julián Ortega Gómez",
+    "position": "",
+    "company": "Detectar Systems",
+    "city": "",
+    "email": "detectarsystems@gmail.com",
+    "phone": "",
+    "created_at": "2025-10-09T15:47:35.914Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 36,
+  "fields": {
+    "title": "senior",
+    "full_name": "Ángela Molina",
+    "position": "",
+    "company": "Estructurar",
+    "city": "",
+    "email": "posventas@estructurar.co",
+    "phone": "3045281069",
+    "created_at": "2025-10-09T15:48:16.385Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 37,
+  "fields": {
+    "title": "senior",
+    "full_name": "Jhon Rodriguez",
+    "position": "",
+    "company": "Ingesed",
+    "city": "",
+    "email": "jrodriguez@ingesed.com",
+    "phone": "3014201614",
+    "created_at": "2025-10-09T15:48:36.557Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 38,
+  "fields": {
+    "title": "senior",
+    "full_name": "Andrea Ruiz",
+    "position": "",
+    "company": "Proyecto ARQ",
+    "city": "",
+    "email": "",
+    "phone": "3125447366",
+    "created_at": "2025-10-09T15:48:49.387Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 39,
+  "fields": {
+    "title": "senior",
+    "full_name": "Santiago Castañeda",
+    "position": "",
+    "company": "E&F Construcciones",
+    "city": "",
+    "email": "ef.construccionessas@gmail.com",
+    "phone": "3122426622",
+    "created_at": "2025-10-09T15:49:10.213Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 40,
+  "fields": {
+    "title": "senior",
+    "full_name": "Juan Arango",
+    "position": "",
+    "company": "Juan Arango",
+    "city": "",
+    "email": "jmarangom22@gmail.com",
+    "phone": "",
+    "created_at": "2025-10-09T15:49:31.916Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 41,
+  "fields": {
+    "title": "",
+    "full_name": "",
+    "position": "",
+    "company": "Trazados Arquitectura",
+    "city": "",
+    "email": "escapeto28@gmail.com",
+    "phone": "3167417025",
+    "created_at": "2025-10-09T15:51:31.243Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 42,
+  "fields": {
+    "title": "senior",
+    "full_name": "Diego Alejandro Arango Gómez",
+    "position": "",
+    "company": "Maz",
+    "city": "",
+    "email": "darango@maz.com.co",
+    "phone": "601 6108010",
+    "created_at": "2025-10-09T15:52:03.683Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 43,
+  "fields": {
+    "title": "senior",
+    "full_name": "Jenifer Vanessa Orozco Ordoñez",
+    "position": "",
+    "company": "IngenioBIM",
+    "city": "",
+    "email": "jenifer.orozco@ingeniobim.co",
+    "phone": "3014170260",
+    "created_at": "2025-10-09T15:52:26.031Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 44,
+  "fields": {
+    "title": "senior",
+    "full_name": "Laura Jiménez Grajales",
+    "position": "",
+    "company": "Constructora Guasandi",
+    "city": "",
+    "email": "dircambulos@constructoradeobras.com",
+    "phone": "",
+    "created_at": "2025-10-09T15:52:44.631Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 45,
+  "fields": {
+    "title": "senior",
+    "full_name": "Marcela Cardona",
+    "position": "",
+    "company": "Conintel",
+    "city": "",
+    "email": "direccionmazanti@gmail.com",
+    "phone": "320 6284446",
+    "created_at": "2025-10-09T15:52:59.161Z"
+  }
+},
+{
+  "model": "quotes.client",
+  "pk": 46,
+  "fields": {
+    "title": "senior",
+    "full_name": "Camilo Andrés Chávez Sandoval",
+    "position": "",
+    "company": "IMBANACO",
+    "city": "",
+    "email": "Camilo.Chavez@quironsalud.com",
+    "phone": "3205535416",
+    "created_at": "2025-10-09T15:53:38.712Z"
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 1,
+  "fields": {
+    "code": "NSR-10",
+    "description": "Reglamento de construcciones sismo resistentes colombiano",
+    "services": [
+      "detection",
+      "protection",
+      "human_safety"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 2,
+  "fields": {
+    "code": "NSR-98",
+    "description": "Reglamento de Construcciones sismo resistentes colombiano",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 3,
+  "fields": {
+    "code": "NFPA 1",
+    "description": "Fire Code",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 4,
+  "fields": {
+    "code": "NFPA 10",
+    "description": "Standard for Portable Fire Extinguishers",
+    "services": [
+      "protection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 5,
+  "fields": {
+    "code": "NFPA 11",
+    "description": "Standard for Low-, Medium-, and High-Expansion Foam",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 6,
+  "fields": {
+    "code": "NFPA 12",
+    "description": "Standard for Carbon Dioxide Extinguishing Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 7,
+  "fields": {
+    "code": "NFPA 13",
+    "description": "Standard for the Installation of Sprinkler Systems",
+    "services": [
+      "detection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 8,
+  "fields": {
+    "code": "NFPA 14",
+    "description": "Standard for the Installation of Standpipe and Hose Systems",
+    "services": [
+      "protection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 9,
+  "fields": {
+    "code": "NFPA 15",
+    "description": "Standard for Water Spray Fixed Systems for Fire Protection",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 10,
+  "fields": {
+    "code": "NFPA 20",
+    "description": "Standard for the Installation of Stationary Pumps for Fire Protection",
+    "services": [
+      "protection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 11,
+  "fields": {
+    "code": "NFPA 22",
+    "description": "Standard for Water Tanks for Private Fire Protection",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 12,
+  "fields": {
+    "code": "NFPA 24",
+    "description": "Standard for the Installation of Private Fire Service Mains and Their Appurtenances",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 13,
+  "fields": {
+    "code": "NFPA 25",
+    "description": "Standard for the Inspection, Testing, and Maintenance of Water-Based Fire Protection Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 14,
+  "fields": {
+    "code": "NFPA 30",
+    "description": "Flammable and Combustible Liquids Code",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 15,
+  "fields": {
+    "code": "NFPA 58",
+    "description": "Liquefied Petroleum Gas Code",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 16,
+  "fields": {
+    "code": "NFPA 70",
+    "description": "National electric code",
+    "services": [
+      "detection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 17,
+  "fields": {
+    "code": "NFPA 72",
+    "description": "National Fire Alarm and Signaling Code",
+    "services": [
+      "detection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 18,
+  "fields": {
+    "code": "NFPA 101",
+    "description": "Fire Safety Code",
+    "services": [
+      "human_safety"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 19,
+  "fields": {
+    "code": "NFPA 750",
+    "description": "Standard on Water Mist Fire Protection Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 20,
+  "fields": {
+    "code": "NFPA 770",
+    "description": "Standard on Hybrid (Water and Inert Gas) Fire Extinguishing Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 21,
+  "fields": {
+    "code": "NFPA 2001",
+    "description": "Standard on Clean Agent Fire Extinguishing Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 22,
+  "fields": {
+    "code": "NFPA 5000",
+    "description": "Building Construction and Safety Code",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 23,
+  "fields": {
+    "code": "IBC",
+    "description": "International Building Code",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 24,
+  "fields": {
+    "code": "FMDS 2-0",
+    "description": "Installation Guidelines for Automatic Sprinklers",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 25,
+  "fields": {
+    "code": "FMDS 2-8",
+    "description": "Earthquake Protection for Water-Based Fire Protection Systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 26,
+  "fields": {
+    "code": "FMDS 8-1",
+    "description": "Commodity Classification",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 27,
+  "fields": {
+    "code": "FMDS 8-3",
+    "description": "Rubber Tire Storage",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 28,
+  "fields": {
+    "code": "FMDS 8-9",
+    "description": "Storage of Class 1, 2, 3, 4 and Plastic Commodities",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 29,
+  "fields": {
+    "code": "FMDS 5-40",
+    "description": "Fire alarm systems",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 30,
+  "fields": {
+    "code": "FMDS 5-48",
+    "description": "Automatic fire detection",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 31,
+  "fields": {
+    "code": "NTC 1669",
+    "description": "Norma para la instalación de conexiones de mangueras contra incendio",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 32,
+  "fields": {
+    "code": "NTC 2301",
+    "description": "Norma para la Instalación de Sistemas de Rociadores",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 33,
+  "fields": {
+    "code": "NTC 2885",
+    "description": "Extintores portátiles contra incendios",
+    "services": [],
+    "default_selected": false
+  }
+},
+{
+  "model": "quotes.norm",
+  "pk": 34,
+  "fields": {
+    "code": "RETIE",
+    "description": "",
+    "services": [
+      "detection"
+    ],
+    "default_selected": true
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 1,
+  "fields": {
+    "name": "protection_autocad.docx",
+    "file": "templates_docs/protection_autocad.docx",
+    "services_tag": "protection",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 2,
+  "fields": {
+    "name": "protection_revit.docx",
+    "file": "templates_docs/protection_revit.docx",
+    "services_tag": "protection",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 3,
+  "fields": {
+    "name": "protection_both.docx",
+    "file": "templates_docs/protection_both.docx",
+    "services_tag": "protection",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 4,
+  "fields": {
+    "name": "detection_autocad.docx",
+    "file": "templates_docs/detection_autocad.docx",
+    "services_tag": "detection",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 5,
+  "fields": {
+    "name": "detection_revit.docx",
+    "file": "templates_docs/detection_revit.docx",
+    "services_tag": "detection",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 6,
+  "fields": {
+    "name": "detection_both.docx",
+    "file": "templates_docs/detection_both.docx",
+    "services_tag": "detection",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 7,
+  "fields": {
+    "name": "human_safety_autocad.docx",
+    "file": "templates_docs/human_safety_autocad.docx",
+    "services_tag": "human_safety",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 8,
+  "fields": {
+    "name": "human_safety_revit.docx",
+    "file": "templates_docs/human_safety_revit.docx",
+    "services_tag": "human_safety",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 9,
+  "fields": {
+    "name": "human_safety_both.docx",
+    "file": "templates_docs/human_safety_both.docx",
+    "services_tag": "human_safety",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 10,
+  "fields": {
+    "name": "protection_detection_autocad.docx",
+    "file": "templates_docs/protection_detection_autocad.docx",
+    "services_tag": "protection|detection",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 11,
+  "fields": {
+    "name": "protection_detection_revit.docx",
+    "file": "templates_docs/protection_detection_revit.docx",
+    "services_tag": "protection|detection",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 12,
+  "fields": {
+    "name": "protection_detection_both.docx",
+    "file": "templates_docs/protection_detection_both.docx",
+    "services_tag": "protection|detection",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 13,
+  "fields": {
+    "name": "protection_human_safety_autocad.docx",
+    "file": "templates_docs/protection_human_safety_autocad.docx",
+    "services_tag": "protection|human_safety",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 14,
+  "fields": {
+    "name": "protection_human_safety_revit.docx",
+    "file": "templates_docs/protection_human_safety_revit.docx",
+    "services_tag": "protection|human_safety",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 15,
+  "fields": {
+    "name": "protection_human_safety_both.docx",
+    "file": "templates_docs/protection_human_safety_both.docx",
+    "services_tag": "protection|human_safety",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 16,
+  "fields": {
+    "name": "detection_human_safety_autocad.docx",
+    "file": "templates_docs/detection_human_safety_autocad.docx",
+    "services_tag": "detection|human_safety",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 17,
+  "fields": {
+    "name": "detection_human_safety_revit.docx",
+    "file": "templates_docs/detection_human_safety_revit.docx",
+    "services_tag": "detection|human_safety",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 18,
+  "fields": {
+    "name": "detection_human_safety_both.docx",
+    "file": "templates_docs/detection_human_safety_both.docx",
+    "services_tag": "detection|human_safety",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 19,
+  "fields": {
+    "name": "protection_detection_human_safety_both.docx",
+    "file": "templates_docs/protection_detection_human_safety_both.docx",
+    "services_tag": "protection|detection|human_safety",
+    "formats_tag": "both"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 20,
+  "fields": {
+    "name": "protection_detection_human_safety_both.docx",
+    "file": "templates_docs/protection_detection_human_safety_autocad.docx",
+    "services_tag": "protection|detection|human_safety",
+    "formats_tag": "autocad"
+  }
+},
+{
+  "model": "quotes.templatedoc",
+  "pk": 21,
+  "fields": {
+    "name": "protection_detection_human_safety_revit.docx",
+    "file": "templates_docs/protection_detection_human_safety_revit.docx",
+    "services_tag": "protection|detection|human_safety",
+    "formats_tag": "revit"
+  }
+},
+{
+  "model": "quotes.quote",
+  "pk": 1,
+  "fields": {
+    "client": 20,
+    "project_name": "Centro Comercial Norte",
+    "is_detection": false,
+    "is_protection": true,
+    "is_human_safety": false,
+    "deliver_autocad": true,
+    "deliver_revit": false,
+    "building_type": "commercial",
+    "area_sqm": "1200.00",
+    "manual_requirements": "",
+    "manual_items_sh": "",
+    "manual_items_detection": "",
+    "manual_items_protection": "",
+    "payment_advance": "40.00",
+    "payment_first_version": "40.00",
+    "payment_final": "20.00",
+    "delivery_time_value": null,
+    "delivery_time_unit": "",
+    "template_doc": null,
+    "generated_doc": "",
+    "value_protection": "0.00",
+    "value_detection": "0.00",
+    "value_human_safety": "0.00",
+    "total_value": "0.00",
+    "created_at": "2025-10-13T15:05:01.353Z",
+    "norms": []
+  }
+},
+{
+  "model": "quotes.quote",
+  "pk": 2,
+  "fields": {
+    "client": 20,
+    "project_name": "Centro Comercial Norte",
+    "is_detection": false,
+    "is_protection": true,
+    "is_human_safety": false,
+    "deliver_autocad": true,
+    "deliver_revit": false,
+    "building_type": "commercial",
+    "area_sqm": "1200.00",
+    "manual_requirements": "",
+    "manual_items_sh": "",
+    "manual_items_detection": "",
+    "manual_items_protection": "",
+    "payment_advance": "40.00",
+    "payment_first_version": "40.00",
+    "payment_final": "20.00",
+    "delivery_time_value": null,
+    "delivery_time_unit": "",
+    "template_doc": null,
+    "generated_doc": "",
+    "value_protection": "0.00",
+    "value_detection": "0.00",
+    "value_human_safety": "0.00",
+    "total_value": "0.00",
+    "created_at": "2025-10-13T15:05:12.315Z",
+    "norms": []
+  }
+}
+]

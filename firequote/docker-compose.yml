@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DB_NAME: firequote_db
+      DB_USER: firequote_user
+      DB_PASSWORD: firequote_password
+      DB_HOST: db
+      DB_PORT: 5432
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: firequote_db
+      POSTGRES_USER: firequote_user
+      POSTGRES_PASSWORD: firequote_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

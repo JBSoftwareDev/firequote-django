@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+    <style>
+        .btn-primary:hover {
+            background-color: #b0050f;
+            border-color: #b0050f;
+        }
+        .btn-outline-danger {
+            color: #e30613;
+            border-color: #e30613;
+        }
+        .btn-outline-danger:hover {
+            background-color: #e30613;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="container py-4">
+
+<div class="header-bar d-flex justify-content-between align-items-end">
+    <img src="{% static 'images/logo.png' %}" class="logo">
+    <h2>Editar Cliente</h2>
+</div>
+
+<form method="POST" class="card shadow p-4">
+    {% csrf_token %}
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">Título</label>
+            <select name="title" class="form-select">
+                <option value="">-- Selecciona --</option>
+                <option value="senor" {% if client.title == "senor" %}selected{% endif %}>Señor</option>
+                <option value="senora" {% if client.title == "senora" %}selected{% endif %}>Señora</option>
+                <option value="ingeniero" {% if client.title == "ingeniero" %}selected{% endif %}>Ingeniero</option>
+                <option value="ingeniera" {% if client.title == "ingeniera" %}selected{% endif %}>Ingeniera</option>
+                <option value="arquitecto" {% if client.title == "arquitecto" %}selected{% endif %}>Arquitecto</option>
+                <option value="arquitecta" {% if client.title == "arquitecta" %}selected{% endif %}>Arquitecta</option>
+            </select>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label">Nombre completo</label>
+            <input type="text" name="full_name" value="{{ client.full_name }}" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Cargo</label>
+            <input type="text" name="position" value="{{ client.position }}" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Empresa</label>
+            <input type="text" name="company" value="{{ client.company }}" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Ciudad</label>
+            <input type="text" name="city" value="{{ client.city }}" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" name="email" value="{{ client.email }}" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input type="text" name="phone" value="{{ client.phone }}" class="form-control">
+        </div>
+
+    </div>
+
+    <div class="text-end mt-4">
+        <a href="{% url 'client_detail' client.id %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+        <button type="submit" class="btn btn-primary">
+            Guardar Cambios
+        </button>
+    </div>
+</form>
+
+</body>
+</html>
