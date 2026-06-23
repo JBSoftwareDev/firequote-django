@@ -229,7 +229,20 @@ def quote_details(request, quote_id):
             messages.error(request, "No existe plantilla configurada para esta combinación.")
             return redirect("quote_form")
 
-        template_path = template.file.path
+        template_filename = get_template_filename(
+            quote.is_detection,
+            quote.is_protection,
+            quote.is_human_safety,
+            quote.deliver_autocad,
+            quote.deliver_revit,
+        )
+
+        template_path = os.path.join(
+            settings.BASE_DIR,
+            "quotes",
+            "templates_docs",
+            template_filename,
+        )
 
         import locale
         from datetime import datetime
