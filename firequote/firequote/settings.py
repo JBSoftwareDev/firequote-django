@@ -86,7 +86,10 @@ import os
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=os.getenv(
+            "DATABASE_URL",
+            "postgres://firequote_user:1234@db:5432/firequote_db"
+        ),
         conn_max_age=600,
     )
 }
