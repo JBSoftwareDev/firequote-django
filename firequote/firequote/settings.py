@@ -85,7 +85,7 @@ import os
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL", "postgres://firequote_user:firequote_password@db:5432/firequote_db"),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
     )
 }
@@ -94,7 +94,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {--
+    {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
