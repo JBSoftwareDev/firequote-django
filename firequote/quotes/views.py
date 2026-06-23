@@ -4,7 +4,7 @@ from .services.quote_service import (
     parse_items,
     build_total_text,
     build_additional_notes,
-    build_payment_schedule,
+    get_template_filename,
 )
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse

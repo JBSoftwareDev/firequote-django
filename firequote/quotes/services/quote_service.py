@@ -189,3 +189,29 @@ def build_additional_notes(notes):
         result[f"note_text_{i + 1}"] = note
 
     return result
+
+def get_template_filename(is_detection, is_protection, is_human_safety, deliver_autocad, deliver_revit):
+    services = []
+
+    if is_detection:
+        services.append("detection")
+    if is_protection:
+        services.append("protection")
+    if is_human_safety:
+        services.append("human_safety")
+
+    if deliver_autocad and deliver_revit:
+        format_tag = "both"
+    elif deliver_autocad:
+        format_tag = "autocad"
+    elif deliver_revit:
+        format_tag = "revit"
+    else:
+        return None
+
+    service_tag = "_".join(services)
+
+    if not service_tag:
+        return None
+
+    return f"{service_tag}_{format_tag}.docx"
