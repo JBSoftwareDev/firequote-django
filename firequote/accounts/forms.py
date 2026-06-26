@@ -3,19 +3,19 @@ from django.contrib.auth.models import User
 
 
 class InvitationForm(forms.Form):
-    email = forms.EmailField(label="Email")
+    email = forms.EmailField(label="Correo")
 
 
 class AcceptInvitationForm(forms.Form):
-    username = forms.CharField(label="Username", max_length=150)
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    confirm_password = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    username = forms.CharField(label="Usuario", max_length=150)
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
+    confirm_password = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput)
 
     def clean_username(self):
         username = self.cleaned_data["username"]
 
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("This username is already taken.")
+            raise forms.ValidationError("Este usuario ya existe.")
 
         return username
 
@@ -25,6 +25,6 @@ class AcceptInvitationForm(forms.Form):
         confirm_password = cleaned_data.get("confirm_password")
 
         if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError("Passwords do not match.")
+            raise forms.ValidationError("Las contraseñas no coinciden.")
 
         return cleaned_data

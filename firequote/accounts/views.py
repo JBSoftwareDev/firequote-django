@@ -42,14 +42,14 @@ def invite_user(request):
             )
 
             send_mail(
-                subject="FireQuote Access",
-                message=f"Create your FireQuote account here:\n\n{invite_url}",
+                subject="Acceso a FireQuote",
+                message=f"Crea tu cuenta de FireQuote aquí:\n\n{invite_url}",
                 from_email=None,
                 recipient_list=[invitation.email],
                 fail_silently=False,
             )
 
-            messages.success(request, "Invitation sent.")
+            messages.success(request, "Correo enviado.")
             return redirect("invite_user")
     else:
         form = InvitationForm()
@@ -74,7 +74,7 @@ def accept_invitation(request, token):
             invitation.used_at = timezone.now()
             invitation.save()
 
-            messages.success(request, "Account created. Please sign in.")
+            messages.success(request, "Cuenta creada. Inicia sesión.")
             return redirect("login")
     else:
         form = AcceptInvitationForm()
