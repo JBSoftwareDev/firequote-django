@@ -1,10 +1,27 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Crear cuenta</title>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/icon.ico' %}">
 </head>
-<body>
-$END$
+<body class="container py-4">
+
+<div class="card p-4">
+    <h2>Crear cuenta</h2>
+    <p>{{ invitation.email }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">
+            Crear
+        </button>
+    </form>
+</div>
+
 </body>
 </html>
