@@ -488,7 +488,12 @@ def quote_details(request, quote_id):
             # OPTIONAL
             "grand_total": format_currency(grand_total),
         }
-                                                                                                       "_")
+
+        # Save the generated .docx file to the output directory
+        safe_client_name = "".join(c for c in quote.client.full_name if c.isalnum() or c in (" ", "_")).strip().replace(
+            " ", "_")
+        safe_project = "".join(c for c in quote.project_name if c.isalnum() or c in (" ", "_")).strip().replace(" ",
+                                                                                                                "_")
         output_filename = build_output_filename(quote)
         os.makedirs(os.path.join(settings.BASE_DIR, "generated_docs"), exist_ok=True)
         output_path = os.path.join(settings.BASE_DIR, "generated_docs", output_filename)
