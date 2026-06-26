@@ -1,11 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<link rel="icon" type="image/x-icon" href="{% static 'images/icon.ico' %}">
 <head>
     <meta charset="UTF-8">
     <title>FireQuote</title>
-
+    <link rel="icon" type="image/x-icon" href="{% static 'images/icon.ico' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,6 +43,21 @@
     <a href="{% url 'client_list' %}" class="btn btn-primary home-btn w-100">Buscar Cliente</a>
     <a href="{% url 'quote_list' %}" class="btn btn-primary home-btn w-100">Buscar Cotización</a>
     <a href="{% url 'quote_form' %}" class="btn btn-primary home-btn w-100">Generar Cotización</a>
+</div>
+
+<div class="home-actions">
+    {% if user.is_superuser or user.groups.all %}
+        <a href="{% url 'invite_user' %}" class="btn btn-outline-danger btn-sm">
+            Nuevo usuario
+        </a>
+    {% endif %}
+
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-delete btn-sm">
+            Salir
+        </button>
+    </form>
 </div>
 
 </body>

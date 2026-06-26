@@ -68,3 +68,25 @@ h4 {
     background-color: #b0050f;
     border-color: #b0050f;
 }
+
+.home-actions {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-delete {
+    background-color: #b0050f;
+    border-color: #b0050f;
+    color: #ffffff;
+}
+
+.btn-delete:hover {
+    background-color: #85040b;
+    border-color: #85040b;
+    color: #ffffff;
+}
