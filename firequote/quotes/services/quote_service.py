@@ -217,51 +217,44 @@ def get_template_filename(is_detection, is_protection, is_human_safety, deliver_
     return f"{service_tag}_{format_tag}.docx"
 
 def build_output_filename(quote):
-    if quote.deliver_autocad and quote.deliver_revit:
-        format_text = "Autocad y Revit"
-    elif quote.deliver_autocad:
-        format_text = "Autocad"
-    elif quote.deliver_revit:
-        format_text = "Revit"
-    else:
-        format_text = "Formato"
-
-    services = []
-
-    if quote.is_human_safety:
-        services.append("SEGURIDAD HUMANA")
-
-    if quote.is_protection:
-        services.append("EXTINCIÓN DE INCENDIOS")
-
-    if quote.is_detection:
-        services.append("DETECCIÓN DE INCENDIOS")
-
-    service_count = len(services)
-
-    if service_count == 1:
-        if quote.is_human_safety and not quote.is_protection and not quote.is_detection:
-            title_text = "COTIZACION DEL ANÁLISIS DE"
-        else:
-            title_text = "COTIZACION DEL DISEÑO DE"
-
-        services_text = services[0]
-
-    elif service_count == 2:
-        title_text = "COTIZACION DE LOS DISEÑOS DE"
-        services_text = f"{services[0]} Y {services[1]}"
-
-    elif service_count == 3:
-        title_text = "COTIZACION DE LOS DISEÑOS DE"
-        services_text = f"{services[0]}, {services[1]} Y {services[2]}"
-
-    else:
-        title_text = "COTIZACION"
-        services_text = ""
-
     project_name = (quote.project_name or "").upper().strip()
 
-    filename = f"{format_text} {title_text} {services_text} - {project_name}.docx"
+    is_detection = quote.is_detection
+    is_protection = quote.is_protection
+    is_human_safety = quote.is_human_safety
+
+    # -------------------------
+    # SINGLE SERVICE
+    # -------------------------
+    if is_human_safety and not is_detection and not is_protection:
+        filename = f"COTIZACION DEL ANÁLISIS DE SEGURIDAD HUMANA - {project_name}.docx"
+
+    elif is_detection and not is_protection and not is_human_safety:
+        filename = f"COTIZACION DEL DISEÑO DE DETECCIÓN DE INCENDIOS - {project_name}.docx"
+
+    elif is_protection and not is_detection and not is_human_safety:
+        filename = f"COTIZACION DEL DISEÑO DE EXTINCIÓN DE INCENDIOS - {project_name}.docx"
+
+    # -------------------------
+    # TWO SERVICES
+    # -------------------------
+    elif is_detection and is_protection and not is_human_safety:
+        filename = f"COTIZACION DE LOS DISEÑOS DE PROTECCIÓN CONTRA INCENDIOS - {project_name}.docx"
+
+    elif is_human_safety and is_detection and not is_protection:
+        filename = f"COTIZACION DE LOS DISEÑOS DE SEGURIDAD HUMANA Y DETECCIÓN DE INCENDIOS - {project_name}.docx"
+
+    elif is_human_safety and is_protection and not is_detection:
+        filename = f"COTIZACION DE LOS DISEÑOS DE SEGURIDAD HUMANA Y EXTINCIÓN DE INCENDIOS - {project_name}.docx"
+
+    # -------------------------
+    # THREE SERVICES
+    # -------------------------
+    elif is_human_safety and is_detection and is_protection:
+        filename = f"COTIZACION DE LOS DISEÑOS DE SEGURIDAD HUMANA Y PROTECCIÓN CONTRA INCENDIOS - {project_name}.docx"
+
+    else:
+        filename = f"COTIZACION - {project_name}.docx"
 
     invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
 
