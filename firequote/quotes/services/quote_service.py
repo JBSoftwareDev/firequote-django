@@ -215,3 +215,57 @@ def get_template_filename(is_detection, is_protection, is_human_safety, deliver_
         return None
 
     return f"{service_tag}_{format_tag}.docx"
+
+def build_output_filename(quote):
+    if quote.deliver_autocad and quote.deliver_revit:
+        format_text = "Autocad y Revit"
+    elif quote.deliver_autocad:
+        format_text = "Autocad"
+    elif quote.deliver_revit:
+        format_text = "Revit"
+    else:
+        format_text = "Formato"
+
+    services = []
+
+    if quote.is_human_safety:
+        services.append("SEGURIDAD HUMANA")
+
+    if quote.is_protection:
+        services.append("EXTINCIÓN DE INCENDIOS")
+
+    if quote.is_detection:
+        services.append("DETECCIÓN DE INCENDIOS")
+
+    service_count = len(services)
+
+    if service_count == 1:
+        if quote.is_human_safety and not quote.is_protection and not quote.is_detection:
+            title_text = "COTIZACION DEL ANÁLISIS DE"
+        else:
+            title_text = "COTIZACION DEL DISEÑO DE"
+
+        services_text = services[0]
+
+    elif service_count == 2:
+        title_text = "COTIZACION DE LOS DISEÑOS DE"
+        services_text = f"{services[0]} Y {services[1]}"
+
+    elif service_count == 3:
+        title_text = "COTIZACION DE LOS DISEÑOS DE"
+        services_text = f"{services[0]}, {services[1]} Y {services[2]}"
+
+    else:
+        title_text = "COTIZACION"
+        services_text = ""
+
+    project_name = (quote.project_name or "").upper().strip()
+
+    filename = f"{format_text} {title_text} {services_text} - {project_name}.docx"
+
+    invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+
+    for char in invalid_chars:
+        filename = filename.replace(char, "")
+
+    return filename
