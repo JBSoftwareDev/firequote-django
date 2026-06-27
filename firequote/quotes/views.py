@@ -219,17 +219,8 @@ def quote_details(request, quote_id):
         print("DEBUG FORMAT:", formats_tag)
 
         # =========================
-        # GET TEMPLATE FROM DATABASE
+        # GET TEMPLATE FROM REPOSITORY
         # =========================
-
-        template = TemplateDoc.objects.filter(
-            services_tag=services_tag,
-            formats_tag=formats_tag
-        ).first()
-
-        if not template:
-            messages.error(request, "No existe plantilla configurada para esta combinación.")
-            return redirect("quote_form")
 
         template_filename = get_template_filename(
             quote.is_detection,
@@ -245,6 +236,10 @@ def quote_details(request, quote_id):
             "templates_docs",
             template_filename,
         )
+
+        if not template_filename or not os.path.exists(template_path):
+            messages.error(request, f"No se encontró la plantilla: {template_filename}")
+            return redirect("quote_form")
 
         import locale
         from datetime import datetime
