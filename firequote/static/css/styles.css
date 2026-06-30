@@ -90,3 +90,21 @@ h4 {
     border-color: #85040b;
     color: #ffffff;
 }
+
+.page-bottom-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-home {
+    color: #e30613;
+    border: 1px solid #e30613;
+    background-color: #ffffff;
+}
+
+.btn-home:hover {
+    background-color: #e30613;
+    color: #ffffff;
+}

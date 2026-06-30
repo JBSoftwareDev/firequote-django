@@ -206,7 +206,7 @@
             </div>
             <div class="form-check">
                 <input type="checkbox" name="is_protection" class="form-check-input" id="is_protection">
-                <label class="form-check-label" for="is_protection">Protección</label>
+                <label class="form-check-label" for="is_protection">Extinción</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="is_human_safety" class="form-check-input" id="is_human_safety">
@@ -227,10 +227,24 @@
             </div>
         </div>
 
-        <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary">Generar Cotización</button>
-            <button type="reset" class="btn btn-secondary">Limpiar</button>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+
+            <a href="{% url 'home' %}" class="btn btn-home">
+                Volver al inicio
+            </a>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    Generar Cotización
+                </button>
+
+                <button type="reset" class="btn btn-secondary">
+                    Limpiar
+                </button>
+            </div>
+
         </div>
+
     </form>
 
     {% if messages %}

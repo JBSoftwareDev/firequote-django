@@ -66,7 +66,7 @@
     <p><strong>Servicios:</strong></p>
     <ul>
         {% if quote.is_detection %}<li>Detección</li>{% endif %}
-        {% if quote.is_protection %}<li>Protección</li>{% endif %}
+        {% if quote.is_protection %}<li>Extinción</li>{% endif %}
         {% if quote.is_human_safety %}<li>Seguridad Humana</li>{% endif %}
     </ul>
 
@@ -88,6 +88,12 @@
             Eliminar cotización
         </button>
     </form>
+</div>
+
+<div class="page-bottom-actions">
+    <a href="{% url 'home' %}" class="btn btn-home">
+        Volver al inicio
+    </a>
 </div>
 
 </body>

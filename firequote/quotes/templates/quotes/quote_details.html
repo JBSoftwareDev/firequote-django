@@ -93,12 +93,12 @@
 
         {% if quote.is_protection %}
         <div class="form-section">
-            <h5>Protección contra incendios</h5>
+            <h5>Extinción de incendios</h5>
             <div class="form-check mb-2">
                 <input type="checkbox" id="add_protection" class="form-check-input" onclick="toggleTextarea('add_protection','manual_items_protection')">
                 <label class="form-check-label" for="add_protection">Agregar entregables manualmente</label>
             </div>
-            <textarea id="manual_items_protection" name="manual_items_protection" class="form-control" placeholder="Entregables adicionales de protección..." disabled></textarea>
+            <textarea id="manual_items_protection" name="manual_items_protection" class="form-control" placeholder="Entregables adicionales de extinción..." disabled></textarea>
         </div>
         {% endif %}
 
@@ -240,8 +240,23 @@
             </div>
         </div>
 
-        <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary">Generar Documento Final</button>
+        <div class="page-bottom-actions">
+
+            <a href="{% url 'home' %}" class="btn btn-home">
+                Volver al inicio
+            </a>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'quote_form' %}?new=1" class="btn btn-home">
+                    Generar otra cotización
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Generar Documento Final
+                </button>
+            </div>
+
         </div>
     </form>
+
 </body>
