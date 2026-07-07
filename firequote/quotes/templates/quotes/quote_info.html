@@ -39,6 +39,12 @@
 </div>
 
 <div class="card p-4">
+
+    <p>
+        <strong>Número de cotización:</strong>
+        COT{{ quote.quote_number|stringformat:"03d" }}-{{ quote.quote_year|stringformat:"s"|slice:"-2:" }}
+    </p>
+
     <p><strong>Proyecto:</strong> {{ quote.project_name }}</p>
 
     <p>
@@ -76,24 +82,26 @@
         {% if quote.deliver_revit %}<li>Revit</li>{% endif %}
     </ul>
 
-    <form
-        method="POST"
-        action="{% url 'quote_delete' quote.id %}"
-        class="text-end mt-4"
-        onsubmit="return confirm('¿Seguro que deseas eliminar esta cotización?');">
+        <div class="d-flex justify-content-between align-items-center mt-4">
 
-        {% csrf_token %}
+        <a href="{% url 'home' %}" class="btn btn-home">
+            Volver al inicio
+        </a>
 
-        <button type="submit" class="btn btn-delete">
-            Eliminar cotización
-        </button>
-    </form>
-</div>
+        <form
+            method="POST"
+            action="{% url 'quote_delete' quote.id %}"
+            onsubmit="return confirm('¿Seguro que deseas eliminar esta cotización?');">
 
-<div class="page-bottom-actions">
-    <a href="{% url 'home' %}" class="btn btn-home">
-        Volver al inicio
-    </a>
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-delete">
+                Eliminar cotización
+            </button>
+        </form>
+
+    </div>
+
 </div>
 
 </body>
