@@ -376,45 +376,44 @@ def quote_details(request, quote_id):
             except:
                 return str(numero)
 
-        prices = calculate_prices(
-            area_sqm=float(quote.area_sqm or 0),
-            building_type=quote.building_type,
-            services={
-                "detection": quote.is_detection,
-                "protection": quote.is_protection,
-                "human_safety": quote.is_human_safety,
-            },
-            formats={
-                "autocad": quote.deliver_autocad,
-                "revit": quote.deliver_revit,
-            }
+        def money_to_decimal(value):
+            try:
+                value = str(value or "0").replace("$", "").replace(".", "").replace(",", "").strip()
+                return Decimal(value or "0")
+            except:
+                return Decimal("0")
+
+        from decimal import Decimal
+
+        quote.value_detection = money_to_decimal(request.POST.get("value_detection"))
+        quote.value_protection = money_to_decimal(request.POST.get("value_protection"))
+        quote.value_human_safety = money_to_decimal(request.POST.get("value_human_safety"))
+
+        quote.value_detection_revit = money_to_decimal(request.POST.get("value_detection_revit"))
+        quote.value_protection_revit = money_to_decimal(request.POST.get("value_protection_revit"))
+        quote.value_human_safety_revit = money_to_decimal(request.POST.get("value_human_safety_revit"))
+
+        quote.total_value = (
+                quote.value_detection +
+                quote.value_protection +
+                quote.value_human_safety
         )
 
-        total_value_text = build_total_text(prices["total_autocad"])
-        total_value_text_revit = build_total_text(prices["total_revit"])
+        quote.total_value_revit = (
+                quote.value_detection_revit +
+                quote.value_protection_revit +
+                quote.value_human_safety_revit
+        )
 
-        # -------------------------
-        # AUTOCAD (saved in model)
-        # -------------------------
-        quote.value_detection = prices["detection_autocad"]
-        quote.value_protection = prices["protection_autocad"]
-        quote.value_human_safety = prices["human_safety_autocad"]
-        quote.total_value = prices["total_autocad"]
+        quote.grand_total = quote.total_value + quote.total_value_revit
 
         quote.save()
 
-        # -------------------------
-        # REVIT (only for template)
-        # -------------------------
-        value_detection_revit = prices["detection_revit"]
-        value_protection_revit = prices["protection_revit"]
-        value_human_safety_revit = prices["human_safety_revit"]
-        total_value_revit = prices["total_revit"]
-
-        # -------------------------
-        # FINAL TOTAL (optional)
-        # -------------------------
-        grand_total = prices["grand_total"]
+        value_detection_revit = quote.value_detection_revit
+        value_protection_revit = quote.value_protection_revit
+        value_human_safety_revit = quote.value_human_safety_revit
+        total_value_revit = quote.total_value_revit
+        grand_total = quote.grand_total
 
         # -------------------------
         # TEXT FOR SINGLE SERVICE TEMPLATES
@@ -661,27 +660,13 @@ def quote_info(request, quote_id):
         id=quote_id
     )
 
-    prices = calculate_prices(
-        area_sqm=float(quote.area_sqm or 0),
-        building_type=quote.building_type,
-        services={
-            "detection": quote.is_detection,
-            "protection": quote.is_protection,
-            "human_safety": quote.is_human_safety,
-        },
-        formats={
-            "autocad": quote.deliver_autocad,
-            "revit": quote.deliver_revit,
-        }
-    )
-
     return render(
         request,
         "quotes/quote_info.html",
         {
             "quote": quote,
-            "total_autocad": format_currency(prices["total_autocad"]),
-            "total_revit": format_currency(prices["total_revit"]),
+            "total_autocad": format_currency(quote.total_value),
+            "total_revit": format_currency(quote.total_value_revit),
         }
     )
 

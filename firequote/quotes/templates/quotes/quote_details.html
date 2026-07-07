@@ -115,6 +115,84 @@
 
         <hr>
 
+        <hr>
+
+<div class="form-section">
+    <h5>Precios</h5>
+
+    {% if quote.deliver_autocad and quote.deliver_revit %}
+        <h6 class="mt-3">AutoCAD</h6>
+    {% endif %}
+
+    {% if quote.deliver_autocad %}
+        {% if quote.is_detection %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor detección</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_detection" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_protection %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor extinción</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_protection" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_human_safety %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_human_safety" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% if quote.deliver_autocad and quote.deliver_revit %}
+        <h6 class="mt-4">Revit</h6>
+    {% endif %}
+
+    {% if quote.deliver_revit %}
+        {% if quote.is_detection %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor detección</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_detection_revit" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_protection %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor extinción</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_protection_revit" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_human_safety %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="value_human_safety_revit" class="form-control" min="0" step="1" required>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
         <div class="form-section">
             <h5>Forma de pago</h5>
             <div class="row g-3">

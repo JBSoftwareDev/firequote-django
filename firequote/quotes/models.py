@@ -112,6 +112,11 @@ class Quote(models.Model):
     value_detection = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     value_human_safety = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_value = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    value_detection_revit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    value_protection_revit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    value_human_safety_revit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_value_revit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    grand_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     # Related template and generated document
     template_doc = models.ForeignKey(TemplateDoc, on_delete=models.SET_NULL, null=True, blank=True)
