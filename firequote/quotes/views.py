@@ -7,6 +7,7 @@ from .services.quote_service import (
     build_payment_schedule,
     get_template_filename,
     build_output_filename,
+    get_next_quote_number,
 )
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
@@ -69,6 +70,8 @@ def quote_form(request):
 
         client.save()
 
+        quote_year, quote_number = get_next_quote_number()
+
         # Create the quote record with service and format options
         quote = Quote.objects.create(
             client=client,
@@ -85,6 +88,9 @@ def quote_form(request):
             is_human_safety=('is_human_safety' in request.POST),
             deliver_autocad=('deliver_autocad' in request.POST),
             deliver_revit=('deliver_revit' in request.POST),
+
+            quote_year=quote_year,
+            quote_number=quote_number,
         )
 
         messages.success(request, "Cotización creada correctamente.")
@@ -435,7 +441,7 @@ def quote_details(request, quote_id):
         # Context data for the Word template
         context = {
             "quote_date": quote_date_es,
-            "quote_number": f"COT{quote.id:03d}-{current_year_short}",
+            "quote_number": f"COT{quote.quote_number:03d}-{str(quote.quote_year)[-2:]}",
 
             "client_city": getattr(quote.client, "city", "") or "",
             "client_company": getattr(quote.client, "company", "") or "",

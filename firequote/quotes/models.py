@@ -39,11 +39,18 @@ class Client(models.Model):
     def __str__(self):
         return f"{self.full_name} — {self.company}"
 
+class QuoteCounter(models.Model):
+    year = models.IntegerField(unique=True)
+    next_number = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.year} - next {self.next_number}"
+
 class Norm(models.Model):
     # Stores fire safety norms and their applicable services.
     SERVICE_CHOICES = [
         ('detection', 'Detección de incendios'),
-        ('protection', 'Protección contra incendios'),
+        ('protection', 'Extinción de incendios'),
         ('human_safety', 'Seguridad humana'),
     ]
 
@@ -82,6 +89,8 @@ class Quote(models.Model):
     deliver_revit = models.BooleanField(default=False)
     building_type = models.CharField(max_length=20, choices=BUILDING_TYPE, blank=True)
     area_sqm = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    quote_year = models.IntegerField(null=True, blank=True)
+    quote_number = models.IntegerField(null=True, blank=True)
 
     # Manual items (optional)
     manual_requirements = models.TextField(blank=True)

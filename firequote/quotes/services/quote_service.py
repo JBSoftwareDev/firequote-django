@@ -262,3 +262,25 @@ def build_output_filename(quote):
         filename = filename.replace(char, "")
 
     return filename
+
+from django.db import transaction
+from django.utils import timezone
+from quotes.models import QuoteCounter
+
+
+def get_next_quote_number():
+    current_year = timezone.now().year
+
+    initial_number = 320 if current_year == 2026 else 1
+
+    with transaction.atomic():
+        counter, created = QuoteCounter.objects.select_for_update().get_or_create(
+            year=current_year,
+            defaults={"next_number": initial_number}
+        )
+
+        number = counter.next_number
+        counter.next_number += 1
+        counter.save()
+
+    return current_year, number
