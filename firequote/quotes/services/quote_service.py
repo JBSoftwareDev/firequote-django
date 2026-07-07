@@ -129,7 +129,7 @@ def build_total_text(value):
         value = 0
 
     # Número sin IVA
-    number_text = f"${value:,.0f}"
+    number_text = format_currency(value)
 
     # Convertir a letras SIN IVA
     words = num2words(value, lang="es")
