@@ -1,5 +1,6 @@
 import pandas as pd
 from decimal import Decimal
+import unicodedata
 
 from django.core.management.base import BaseCommand
 
@@ -8,6 +9,30 @@ from quotes.models import (
     Quote
 )
 
+def normalize_text(value):
+    value = str(value or "").strip().lower()
+    value = unicodedata.normalize("NFKD", value)
+    value = "".join(c for c in value if not unicodedata.combining(c))
+    return value
+
+
+def get_name_keys(full_name):
+    tokens = normalize_text(full_name).split()
+
+    if len(tokens) < 2:
+        return set()
+
+    keys = set()
+
+    first_name = tokens[0]
+
+    for token in tokens[1:]:
+        keys.add(f"{first_name} {token}")
+
+    if len(tokens) >= 3:
+        keys.add(f"{tokens[1]} {tokens[2]}")
+
+    return keys
 
 class Command(BaseCommand):
 
@@ -29,6 +54,11 @@ class Command(BaseCommand):
 
         clients_created = 0
         quotes_created = 0
+
+        Quote.objects.all().delete()
+        Client.objects.all().delete()
+
+        client_index = {}
 
         for sheet in years:
 
@@ -71,13 +101,14 @@ class Command(BaseCommand):
 
             df = df.rename(
                 columns={
-                    "Cliente":"company",
-                    "Persona Encargada":"full_name",
-                    "Correo":"email",
-                    "Telefono":"phone",
-                    "Descripción de la cotización":"project_name",
-                    "Valor sin IVA":"total_value",
-                    "Fecha de cotización":"created_at",
+                    "Cliente": "company",
+                    "Persona Encargada": "full_name",
+                    "Cargo": "position",
+                    "Correo": "email",
+                    "Telefono": "phone",
+                    "Descripción de la cotización": "project_name",
+                    "Valor sin IVA": "total_value",
+                    "Fecha de cotización": "created_at",
                 }
             )
 
@@ -111,6 +142,16 @@ class Command(BaseCommand):
                     )
                 ).strip()
 
+                position = str(
+                    row.get(
+                        "position",
+                        ""
+                    )
+                ).strip()
+
+                if position.lower() == "nan":
+                    position = ""
+
                 if (
                     not company
                     and
@@ -118,58 +159,48 @@ class Command(BaseCommand):
                 ):
                     continue
 
-                client = (
-                    Client.objects
-                    .filter(
-                        company__iexact=company,
-                        full_name__iexact=full_name
-                    )
-                    .first()
-                )
+                name_keys = get_name_keys(full_name)
+
+                client = None
+
+                for key in name_keys:
+                    if key in client_index:
+                        client = client_index[key]
+                        break
 
                 if not client:
-
                     client = Client.objects.create(
-
                         company=company,
-
                         full_name=full_name,
-
                         email=email,
-
                         phone=phone,
-
                         title="",
-
-                        position="",
-
+                        position=position,
                         city=""
                     )
 
                     clients_created += 1
 
                 else:
+                    if full_name:
+                        client.full_name = full_name
 
-                    updated = False
+                    if company:
+                        client.company = company
 
-                    if (
-                        not client.email
-                        and
-                        email
-                    ):
+                    if email:
                         client.email = email
-                        updated = True
 
-                    if (
-                        not client.phone
-                        and
-                        phone
-                    ):
+                    if phone:
                         client.phone = phone
-                        updated = True
 
-                    if updated:
-                        client.save()
+                    if position:
+                        client.position = position
+
+                    client.save()
+
+                for key in name_keys:
+                    client_index[key] = client
 
                 value = row.get("total_value")
 
