@@ -169,20 +169,6 @@
             </div>
         </div>
 
-        <div class="mb-4">
-            <label class="form-label d-block">Tipo de construcción</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="building_type" id="building_residential" value="residential" required
-                       {% if quote.building_type == "residential" %}checked{% endif %}>
-                <label class="form-check-label" for="building_residential">Residencial</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="building_type" id="building_commercial" value="commercial" required
-                       {% if quote.building_type == "commercial" %}checked{% endif %}>
-                <label class="form-check-label" for="building_commercial">Comercial</label>
-            </div>
-        </div>
-
         <!-- Servicios -->
         <div class="form-section">
             <h3>Servicios</h3>
