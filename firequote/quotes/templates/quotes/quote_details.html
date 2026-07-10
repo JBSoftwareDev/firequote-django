@@ -59,21 +59,158 @@
         </h2>
     </div>
 
-    <form method="POST" action="{% url 'quote_details' quote.id %}" class="card shadow p-4">
+    <form
+        method="POST"
+        action="{% if edit_mode %}{% url 'quote_update' quote.id %}{% else %}{% url 'quote_details' quote.id %}{% endif %}"
+        class="card shadow p-4"
+        {% if edit_mode %}
+        onsubmit="return confirm('¿Deseas guardar los cambios de esta cotización?');"
+        {% endif %}
+    >
+
         {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="form_action"
+            value="{% if edit_mode %}save{% else %}generate{% endif %}"
+        >
 
         <div class="mb-4">
             <h4>Cliente: <span class="text-primary">{{ quote.client.full_name }}</span></h4>
             <p><strong>Proyecto:</strong> {{ quote.project_name }}</p>
-        </div>1
+        </div>
+
+        <div class="form-section">
+            <h5>Datos de la cotización</h5>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Nombre del proyecto
+                </label>
+
+                <input
+                    type="text"
+                    name="project_name"
+                    class="form-control"
+                    value="{{ quote.project_name }}"
+                    required
+                >
+            </div>
+
+            <label class="form-label d-block">
+                Servicios
+            </label>
+
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    name="is_detection"
+                    id="is_detection"
+                    class="form-check-input"
+                    {% if quote.is_detection %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="is_detection"
+                >
+                    Detección
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    name="is_protection"
+                    id="is_protection"
+                    class="form-check-input"
+                    {% if quote.is_protection %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="is_protection"
+                >
+                    Extinción
+                </label>
+            </div>
+
+            <div class="form-check mb-3">
+                <input
+                    type="checkbox"
+                    name="is_human_safety"
+                    id="is_human_safety"
+                    class="form-check-input"
+                    {% if quote.is_human_safety %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="is_human_safety"
+                >
+                    Seguridad Humana
+                </label>
+            </div>
+
+            <label class="form-label d-block">
+                Formatos
+            </label>
+
+            <div class="form-check form-check-inline">
+                <input
+                    type="checkbox"
+                    name="deliver_autocad"
+                    id="deliver_autocad"
+                    class="form-check-input"
+                    {% if quote.deliver_autocad %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="deliver_autocad"
+                >
+                    AutoCAD
+                </label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input
+                    type="checkbox"
+                    name="deliver_revit"
+                    id="deliver_revit"
+                    class="form-check-input"
+                    {% if quote.deliver_revit %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="deliver_revit"
+                >
+                    Revit
+                </label>
+            </div>
+        </div>
 
         <div class="form-section">
             <h5>Requerimientos adicionales</h5>
             <div class="form-check mb-2">
-                <input type="checkbox" id="add_requirements" class="form-check-input" onclick="toggleTextarea('add_requirements','manual_requirements')">
+                <input
+                    type="checkbox"
+                    id="add_requirements"
+                    class="form-check-input"
+                    onclick="toggleTextarea('add_requirements','manual_requirements')"
+                    {% if quote.manual_requirements %}checked{% endif %}
+                >
                 <label class="form-check-label" for="add_requirements">Agregar requerimientos manualmente</label>
             </div>
-            <textarea id="manual_requirements" name="manual_requirements" class="form-control" placeholder="Escribe los requerimientos adicionales..." disabled></textarea>
+            <textarea
+                id="manual_requirements"
+                name="manual_requirements"
+                class="form-control"
+                placeholder="Escribe los requerimientos adicionales..."
+                {% if not quote.manual_requirements %}disabled{% endif %}
+            >{{ quote.manual_requirements }}</textarea>
         </div>
 
         {% if quote.is_detection or quote.is_protection or quote.is_human_safety %}
@@ -84,10 +221,22 @@
         <div class="form-section">
             <h5>Detección de incendios</h5>
             <div class="form-check mb-2">
-                <input type="checkbox" id="add_detection" class="form-check-input" onclick="toggleTextarea('add_detection','manual_items_detection')">
+                <input
+                    type="checkbox"
+                    id="add_detection"
+                    class="form-check-input"
+                    onclick="toggleTextarea('add_detection','manual_items_detection')"
+                    {% if quote.manual_items_detection %}checked{% endif %}
+                >
                 <label class="form-check-label" for="add_detection">Agregar entregabless manualmente</label>
             </div>
-            <textarea id="manual_items_detection" name="manual_items_detection" class="form-control" placeholder="Entregables adicionales de detección..." disabled></textarea>
+            <textarea
+                id="manual_items_detection"
+                name="manual_items_detection"
+                class="form-control"
+                placeholder="Entregables adicionales de detección..."
+                {% if not quote.manual_items_detection %}disabled{% endif %}
+            >{{ quote.manual_items_detection }}</textarea>
         </div>
         {% endif %}
 
@@ -95,10 +244,22 @@
         <div class="form-section">
             <h5>Extinción de incendios</h5>
             <div class="form-check mb-2">
-                <input type="checkbox" id="add_protection" class="form-check-input" onclick="toggleTextarea('add_protection','manual_items_protection')">
+                <input
+                    type="checkbox"
+                    id="add_protection"
+                    class="form-check-input"
+                    onclick="toggleTextarea('add_protection','manual_items_protection')"
+                    {% if quote.manual_items_protection %}checked{% endif %}
+                >
                 <label class="form-check-label" for="add_protection">Agregar entregables manualmente</label>
             </div>
-            <textarea id="manual_items_protection" name="manual_items_protection" class="form-control" placeholder="Entregables adicionales de extinción..." disabled></textarea>
+            <textarea
+                id="manual_items_protection"
+                name="manual_items_protection"
+                class="form-control"
+                placeholder="Entregables adicionales de extinción..."
+                {% if not quote.manual_items_protection %}disabled{% endif %}
+            >{{ quote.manual_items_protection }}</textarea>
         </div>
         {% endif %}
 
@@ -106,10 +267,22 @@
         <div class="form-section">
             <h5>Seguridad Humana</h5>
             <div class="form-check mb-2">
-                <input type="checkbox" id="add_sh" class="form-check-input" onclick="toggleTextarea('add_sh','manual_items_sh')">
+                <input
+                    type="checkbox"
+                    id="add_sh"
+                    class="form-check-input"
+                    onclick="toggleTextarea('add_sh','manual_items_sh')"
+                    {% if quote.manual_items_sh %}checked{% endif %}
+                >
                 <label class="form-check-label" for="add_sh">Agregar entregables manualmente</label>
             </div>
-            <textarea id="manual_items_sh" name="manual_items_sh" class="form-control" placeholder="Entregables adicionales de seguridad humana..." disabled></textarea>
+            <textarea
+                id="manual_items_sh"
+                name="manual_items_sh"
+                class="form-control"
+                placeholder="Entregables adicionales de seguridad humana..."
+                {% if not quote.manual_items_sh %}disabled{% endif %}
+            >{{ quote.manual_items_sh }}</textarea>
         </div>
         {% endif %}
 
@@ -130,7 +303,15 @@
             <label class="col-md-4 form-label mb-0">Valor detección</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_detection" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_detection"
+                    class="form-control"
+                    value="{{ quote.value_detection|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -140,7 +321,15 @@
             <label class="col-md-4 form-label mb-0">Valor extinción</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_protection" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_protection"
+                    class="form-control"
+                    value="{{ quote.value_protection|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -150,7 +339,15 @@
             <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_human_safety" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_human_safety"
+                    class="form-control"
+                    value="{{ quote.value_human_safety|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -166,7 +363,15 @@
             <label class="col-md-4 form-label mb-0">Valor detección</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_detection_revit" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_detection_revit"
+                    class="form-control"
+                    value="{{ quote.value_detection_revit|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -176,7 +381,15 @@
             <label class="col-md-4 form-label mb-0">Valor extinción</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_protection_revit" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_protection_revit"
+                    class="form-control"
+                    value="{{ quote.value_protection_revit|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -186,7 +399,15 @@
             <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" name="value_human_safety_revit" class="form-control" min="0" step="1" required>
+                <input
+                    type="number"
+                    name="value_human_safety_revit"
+                    class="form-control"
+                    value="{{ quote.value_human_safety_revit|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
         {% endif %}
@@ -287,14 +508,35 @@
                    class="form-control"
                    style="max-width: 120px;"
                    min="1"
-                   value="3"
+                   value="{{ quote.delivery_time_value|default:3 }}"
                    required>
 
                 <!-- Unidad -->
-                <select name="delivery_time_unit" class="form-select" style="max-width: 150px;">
-                    <option value="dias">Días</option>
-                    <option value="semanas" selected>Semanas</option>
-                    <option value="meses">Meses</option>
+                <select
+                    name="delivery_time_unit"
+                    class="form-select"
+                    style="max-width: 150px;"
+                >
+                    <option
+                        value="days"
+                        {% if quote.delivery_time_unit == "days" %}selected{% endif %}
+                    >
+                        Días
+                    </option>
+
+                    <option
+                        value="weeks"
+                        {% if quote.delivery_time_unit == "weeks" %}selected{% endif %}
+                    >
+                        Semanas
+                    </option>
+
+                    <option
+                        value="months"
+                        {% if quote.delivery_time_unit == "months" %}selected{% endif %}
+                    >
+                        Meses
+                    </option>
                 </select>
             </div>
         </div>
@@ -330,7 +572,11 @@
                 </a>
 
                 <button type="submit" class="btn btn-primary">
-                    Generar Documento Final
+                    {% if edit_mode %}
+                        Guardar cambios
+                    {% else %}
+                        Generar Documento Final
+                    {% endif %}
                 </button>
             </div>
 

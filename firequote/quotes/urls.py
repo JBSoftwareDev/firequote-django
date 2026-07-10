@@ -15,9 +15,23 @@ urlpatterns = [
     path("cotizaciones/", views.quote_list, name="quote_list"),
     path("cotizaciones/<int:quote_id>/detalle/", views.quote_info, name="quote_info"),
     path("cotizaciones/<int:quote_id>/eliminar/", views.quote_delete, name="quote_delete"),
+
     path(
         "backup/download/",
         views.download_backup,
         name="download_backup",
     ),
+
+    path(
+        "cotizaciones/<int:quote_id>/editar/",
+        views.quote_update,
+        name="quote_update",
+    ),
+
+    path(
+        "cotizaciones/<int:quote_id>/descargar/",
+        views.quote_download,
+        name="quote_download",
+    ),
+
 ]

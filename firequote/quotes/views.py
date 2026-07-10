@@ -1,5 +1,4 @@
 from .services.quote_service import (
-    calculate_prices,
     format_currency,
     parse_items,
     build_total_text,
@@ -18,6 +17,7 @@ import os
 from .models import Quote, Client, Norm, TemplateDoc
 from django.conf import settings
 from docxtpl import Listing, RichText
+from decimal import Decimal
 
 """
 quotes/views.py
@@ -112,448 +112,639 @@ def quote_form(request):
         }
     )
 
+def money_to_decimal(value):
+    """
+    Converts values such as:
+    1500000
+    $1.500.000
+    1,500,000
+    into Decimal.
+    """
+    try:
+        clean_value = (
+            str(value or "0")
+            .replace("$", "")
+            .replace(".", "")
+            .replace(",", "")
+            .replace(" ", "")
+            .strip()
+        )
+        return Decimal(clean_value or "0")
+    except (TypeError, ValueError, ArithmeticError):
+        return Decimal("0")
 
-# View: manage quote details and generate the final Word (.docx) report
-def quote_details(request, quote_id):
-    quote = get_object_or_404(Quote, id=quote_id)
 
-    # Load all available reference norms for display
-    norms = Norm.objects.all().order_by("order")
+def save_quote_details(quote, request):
+    """
+    Updates a quote using the submitted detail form.
+    It does not generate or store a Word document.
+    """
 
-    # Parse text inputs into structured lists
-    if request.method == "POST":
-        client_requirements = parse_items(request.POST.get("manual_requirements", ""))
-        items_human_safety = parse_items(request.POST.get("manual_items_sh", ""))
-        items_protection = parse_items(request.POST.get("manual_items_protection", ""))
-        items_detection = parse_items(request.POST.get("manual_items_detection", ""))
+    quote.project_name = (
+        request.POST.get("project_name", "").strip()
+        or quote.project_name
+    )
 
+    # Missing checkboxes mean False.
+    if "is_detection" in request.POST:
+        quote.is_detection = True
+
+    if "is_protection" in request.POST:
+        quote.is_protection = True
+
+    if "is_human_safety" in request.POST:
+        quote.is_human_safety = True
+
+    if "deliver_autocad" in request.POST:
+        quote.deliver_autocad = True
+
+    if "deliver_revit" in request.POST:
+        quote.deliver_revit = True
+
+    # Manual requirements and deliverables
+    quote.manual_requirements = request.POST.get(
+        "manual_requirements",
+        "",
+    ).strip()
+
+    quote.manual_items_sh = request.POST.get(
+        "manual_items_sh",
+        "",
+    ).strip()
+
+    quote.manual_items_detection = request.POST.get(
+        "manual_items_detection",
+        "",
+    ).strip()
+
+    quote.manual_items_protection = request.POST.get(
+        "manual_items_protection",
+        "",
+    ).strip()
+
+    try:
         notes_count = int(request.POST.get("notes_count", 0))
-        additional_notes = [
-            request.POST.get(f"note_{i}", "").strip()
-            for i in range(1, notes_count + 1)
-            if request.POST.get(f"note_{i}", "").strip()
+    except (TypeError, ValueError):
+        notes_count = 0
+
+    quote.additional_notes = [
+        request.POST.get(f"note_{i}", "").strip()
+        for i in range(1, notes_count + 1)
+        if request.POST.get(f"note_{i}", "").strip()
+    ]
+
+    def to_int(value, default):
+        try:
+            return int(float(value))
+        except (TypeError, ValueError):
+            return int(default or 0)
+
+    # Payment schedule
+    quote.payment_advance = to_int(
+        request.POST.get("payment_advance"),
+        quote.payment_advance,
+    )
+
+    quote.payment_first_version = to_int(
+        request.POST.get("payment_first_version"),
+        quote.payment_first_version,
+    )
+
+    quote.payment_final = to_int(
+        request.POST.get("payment_final"),
+        quote.payment_final,
+    )
+
+    # Delivery time
+    quote.delivery_time_value = to_int(
+        request.POST.get("delivery_time_value"),
+        quote.delivery_time_value or 3,
+    )
+
+    valid_time_units = {"days", "weeks", "months"}
+    submitted_unit = request.POST.get("delivery_time_unit", "")
+
+    if submitted_unit in valid_time_units:
+        quote.delivery_time_unit = submitted_unit
+
+    quote.value_detection = money_to_decimal(
+        request.POST.get("value_detection")
+    )
+
+    quote.value_protection = money_to_decimal(
+        request.POST.get("value_protection")
+    )
+
+    quote.value_human_safety = money_to_decimal(
+        request.POST.get("value_human_safety")
+    )
+
+    quote.value_detection_revit = money_to_decimal(
+        request.POST.get("value_detection_revit")
+    )
+
+    quote.value_protection_revit = money_to_decimal(
+        request.POST.get("value_protection_revit")
+    )
+
+    quote.value_human_safety_revit = money_to_decimal(
+        request.POST.get("value_human_safety_revit")
+    )
+
+    quote.total_value = (
+        quote.value_detection
+        + quote.value_protection
+        + quote.value_human_safety
+    )
+
+    quote.total_value_revit = (
+        quote.value_detection_revit
+        + quote.value_protection_revit
+        + quote.value_human_safety_revit
+    )
+
+    quote.grand_total = (
+        quote.total_value
+        + quote.total_value_revit
+    )
+
+    quote.save()
+
+    posted_norm_ids = [
+        int(norm_id)
+        for norm_id in request.POST.getlist("selected_norms")
+        if str(norm_id).isdigit()
+    ]
+
+    quote.norms.set(
+        Norm.objects.filter(id__in=posted_norm_ids)
+    )
+
+def generate_quote_response(quote):
+    """
+    Generates a Word document using the data already saved
+    in the Quote model and returns it as an HTTP download.
+    """
+
+    client_requirements = parse_items(
+        quote.manual_requirements
+    )
+
+    items_human_safety = parse_items(
+        quote.manual_items_sh
+    )
+
+    items_protection = parse_items(
+        quote.manual_items_protection
+    )
+
+    items_detection = parse_items(
+        quote.manual_items_detection
+    )
+
+    additional_notes = quote.additional_notes or []
+
+    notes_variables = build_additional_notes(
+        notes=additional_notes
+    )
+
+    template_filename = get_template_filename(
+        quote.is_detection,
+        quote.is_protection,
+        quote.is_human_safety,
+        quote.deliver_autocad,
+        quote.deliver_revit,
+    )
+
+    if not template_filename:
+        raise FileNotFoundError(
+            "No existe una plantilla para esta combinación."
+        )
+
+    template_path = os.path.join(
+        settings.BASE_DIR,
+        "quotes",
+        "templates_docs",
+        template_filename,
+    )
+
+    if not os.path.exists(template_path):
+        raise FileNotFoundError(
+            f"No se encontró la plantilla {template_filename}."
+        )
+
+    from datetime import datetime
+    from num2words import num2words
+
+    current_year = datetime.now().year
+
+    meses_es = {
+        1: "enero",
+        2: "febrero",
+        3: "marzo",
+        4: "abril",
+        5: "mayo",
+        6: "junio",
+        7: "julio",
+        8: "agosto",
+        9: "septiembre",
+        10: "octubre",
+        11: "noviembre",
+        12: "diciembre",
+    }
+
+    today = datetime.now()
+
+    quote_date_es = (
+        f"{today.day:02d} de "
+        f"{meses_es[today.month]} de "
+        f"{today.year}"
+    )
+
+    def format_bullets(items, bullet="-", indent=0, gap=6):
+        valid_items = [
+            str(item).strip()
+            for item in items
+            if item and str(item).strip()
         ]
 
-        notes_variables = build_additional_notes(
-            notes=additional_notes
+        if not valid_items:
+            return ""
+
+        padding = "\u00A0" * indent
+        spacing = "\u00A0" * gap
+
+        return Listing(
+            "\a".join(
+                f"{padding}{bullet}{spacing}{item}"
+                for item in valid_items
+            )
         )
 
-        print("DEBUG NOTES:")
-        print(notes_variables)
+    reference_norms = RichText()
 
-        payment_advance = request.POST.get("payment_advance", "")
-        payment_first_version = request.POST.get("payment_first_version", "")
-        payment_final = request.POST.get("payment_final", "")
-        delivery_time_value = request.POST.get("delivery_time_value", "")
-        delivery_time_unit = request.POST.get("delivery_time_unit", "")
-
-        # Normalize checkbox input (HTML sends "on"/"true"/None inconsistently)
-        def str2bool(v):
-            return str(v).lower() in ("true", "1", "yes", "on")
-
-        quote.is_detection = str2bool(request.POST.get("is_detection", quote.is_detection))
-        quote.is_protection = str2bool(request.POST.get("is_protection", quote.is_protection))
-        quote.is_human_safety = str2bool(request.POST.get("is_human_safety", quote.is_human_safety))
-        quote.deliver_autocad = str2bool(request.POST.get("deliver_autocad", quote.deliver_autocad))
-        quote.deliver_revit = str2bool(request.POST.get("deliver_revit", quote.deliver_revit))
-
-        def to_int(value, default):
-            try:
-                return int(float(value))
-            except:
-                return default
-
-        quote.payment_advance = to_int(payment_advance, quote.payment_advance)
-        quote.payment_first_version = to_int(payment_first_version, quote.payment_first_version)
-        quote.payment_final = to_int(payment_final, quote.payment_final)
-        quote.delivery_time_value = int(delivery_time_value) if str(delivery_time_value).isdigit() else 3
-        quote.delivery_time_unit = delivery_time_unit or "semanas"
-        quote.delivery_time_unit = delivery_time_unit or quote.delivery_time_unit
-        quote.save()
-
-        # Handle default vs. user-selected reference norms
-        posted_norm_ids = request.POST.getlist("selected_norms")  # viene como lista de strings
-        # Safely convert submitted IDs to integers
-        try:
-            posted_norm_ids = [int(i) for i in posted_norm_ids if i and str(i).isdigit()]
-        except ValueError:
-            posted_norm_ids = []
-
-        if posted_norm_ids:
-            selected_norms_qs = Norm.objects.filter(id__in=posted_norm_ids)
-        else:
-            selected_norms_qs = Norm.objects.none()
-
-            if quote.is_detection:
-                selected_norms_qs = selected_norms_qs | Norm.objects.filter(default_detection=True)
-
-            if quote.is_protection:
-                selected_norms_qs = selected_norms_qs | Norm.objects.filter(default_protection=True)
-
-            if quote.is_human_safety:
-                selected_norms_qs = selected_norms_qs | Norm.objects.filter(default_human_safety=True)
-
-            selected_norms_qs = selected_norms_qs.distinct().order_by("order")
-
-        # Replace previous norms assigned to this quote
-        quote.norms.set(selected_norms_qs)
-        quote.save()
-
-        # =========================
-        # BUILD TEMPLATE TAGS
-        # =========================
-
-        services = []
-
-        if quote.is_detection:
-            services.append("detection")
-        if quote.is_protection:
-            services.append("protection")
-        if quote.is_human_safety:
-            services.append("human_safety")
-
-        services_tag = "_".join(services)
-
-        formats = []
-
-        if quote.deliver_autocad and quote.deliver_revit:
-            formats_tag = "both"
-        elif quote.deliver_autocad:
-            formats_tag = "autocad"
-        elif quote.deliver_revit:
-            formats_tag = "revit"
-        else:
-            formats_tag = ""
-
-        print("DEBUG SERVICES:", services_tag)
-        print("DEBUG FORMAT:", formats_tag)
-
-        # =========================
-        # GET TEMPLATE FROM REPOSITORY
-        # =========================
-
-        template_filename = get_template_filename(
-            quote.is_detection,
-            quote.is_protection,
-            quote.is_human_safety,
-            quote.deliver_autocad,
-            quote.deliver_revit,
-        )
-
-        template_path = os.path.join(
-            settings.BASE_DIR,
-            "quotes",
-            "templates_docs",
-            template_filename,
-        )
-
-        if not template_filename or not os.path.exists(template_path):
-            messages.error(request, f"No se encontró la plantilla: {template_filename}")
-            return redirect("quote_form")
-
-        import locale
-        from datetime import datetime
-
-        current_year = datetime.now().year
-        current_year_short = str(current_year)[-2:]
-
-        # Helpers: format bullet-point text for correct Word rendering
-        def format_bullets(items, bullet="-", indent=0, gap=6):
-            valid_items = [
-                str(i).strip()
-                for i in items
-                if i and str(i).strip()
-            ]
-
-            if not valid_items:
-                return ""
-
-            padding = "\u00A0" * indent
-            spacing = "\u00A0" * gap
-
-            return Listing(
-                "\a".join(
-                    f"{padding}{bullet}{spacing}{item}"
-                    for item in valid_items
-                )
+    for index, norm in enumerate(
+        quote.norms.all().order_by("order")
+    ):
+        if index > 0:
+            reference_norms.add(
+                "\n",
+                font="Cambria",
+                size=22,
             )
 
-        # Format date in Spanish (fallback for Windows locale issues)
-        try:
-            locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
-        except locale.Error:
-            try:
-                locale.setlocale(locale.LC_TIME, "Spanish_Spain")
-            except locale.Error:
-                meses_es = {
-                    "January": "enero", "February": "febrero", "March": "marzo", "April": "abril",
-                    "May": "mayo", "June": "junio", "July": "julio", "August": "agosto",
-                    "September": "septiembre", "October": "octubre", "November": "noviembre", "December": "diciembre"
-                }
-                fecha_en = datetime.now().strftime("%d de %B de %Y")
-                for en, es in meses_es.items():
-                    fecha_en = fecha_en.replace(en, es)
-                quote_date_es = fecha_en
-            else:
-                quote_date_es = datetime.now().strftime("%d de %B de %Y")
-        else:
-            quote_date_es = datetime.now().strftime("%d de %B de %Y")
+        reference_norms.add(
+            "\u00A0" * 8,
+            font="Cambria",
+            size=22,
+        )
 
-        # Build formatted list of reference norms
-        # Build formatted list of reference norms
-        # Build formatted list of reference norms with italic descriptions
-        reference_norms = RichText()
+        reference_norms.add(
+            "-",
+            font="Cambria",
+            size=22,
+        )
 
-        FONT_NAME = "Cambria"
-        FONT_SIZE = 22  # 11 pt en Word
+        reference_norms.add(
+            "\u00A0" * 6,
+            font="Cambria",
+            size=22,
+        )
 
-        for index, n in enumerate(quote.norms.all().order_by("order")):
+        reference_norms.add(
+            (norm.code or "").strip(),
+            font="Cambria",
+            size=22,
+        )
 
-            code = (n.code or "").strip()
-            description = (n.description or "").strip()
+        description = (norm.description or "").strip()
 
-            if index > 0:
-                reference_norms.add(
-                    "\n",
-                    font=FONT_NAME,
-                    size=FONT_SIZE
-                )
-
+        if description:
             reference_norms.add(
-                "\u00A0" * 8,
-                font=FONT_NAME,
-                size=FONT_SIZE
+                ' "',
+                font="Cambria",
+                size=22,
             )
 
             reference_norms.add(
-                "-",
-                font=FONT_NAME,
-                size=FONT_SIZE
+                description,
+                font="Cambria",
+                size=22,
+                italic=True,
             )
 
             reference_norms.add(
-                "\u00A0" * 6,
-                font=FONT_NAME,
-                size=FONT_SIZE
+                '"',
+                font="Cambria",
+                size=22,
             )
 
-            reference_norms.add(
-                code,
-                font=FONT_NAME,
-                size=FONT_SIZE
-            )
-
-            if description:
-                reference_norms.add(
-                    ' "',
-                    font=FONT_NAME,
-                    size=FONT_SIZE
-                )
-
-                reference_norms.add(
-                    description,
-                    font=FONT_NAME,
-                    size=FONT_SIZE,
-                    italic=True
-                )
-
-                reference_norms.add(
-                    '"',
-                    font=FONT_NAME,
-                    size=FONT_SIZE
-                )
-
-        # Get display title (Mr./Mrs.) from client model
-        if hasattr(quote.client, "get_title_display"):
-            client_title = quote.client.get_title_display()
-        else:
-            client_title = getattr(quote.client, "title", "") or ""
-
-        # =========================
-        # CALCULATE PRICES
-        # =========================
-        from num2words import num2words
-
-        def numero_a_texto(numero):
-            try:
-                return num2words(numero, lang="es").capitalize()
-            except:
-                return str(numero)
-
-        def money_to_decimal(value):
-            try:
-                value = str(value or "0").replace("$", "").replace(".", "").replace(",", "").strip()
-                return Decimal(value or "0")
-            except:
-                return Decimal("0")
-
-        from decimal import Decimal
-
-        quote.value_detection = money_to_decimal(request.POST.get("value_detection"))
-        quote.value_protection = money_to_decimal(request.POST.get("value_protection"))
-        quote.value_human_safety = money_to_decimal(request.POST.get("value_human_safety"))
-
-        quote.value_detection_revit = money_to_decimal(request.POST.get("value_detection_revit"))
-        quote.value_protection_revit = money_to_decimal(request.POST.get("value_protection_revit"))
-        quote.value_human_safety_revit = money_to_decimal(request.POST.get("value_human_safety_revit"))
-
-        quote.total_value = (
-                quote.value_detection +
-                quote.value_protection +
-                quote.value_human_safety
+    try:
+        delivery_number_text = num2words(
+            quote.delivery_time_value or 0,
+            lang="es",
+        ).capitalize()
+    except Exception:
+        delivery_number_text = str(
+            quote.delivery_time_value or 0
         )
 
-        quote.total_value_revit = (
-                quote.value_detection_revit +
-                quote.value_protection_revit +
-                quote.value_human_safety_revit
-        )
+    delivery_unit = (
+        quote.get_delivery_time_unit_display()
+        or ""
+    ).lower()
 
-        quote.grand_total = quote.total_value + quote.total_value_revit
+    delivery_time_text = (
+        f"{delivery_number_text} "
+        f"({quote.delivery_time_value or 0}) "
+        f"{delivery_unit} a partir del pago del anticipo."
+    )
 
-        quote.save()
+    client_title = (
+        quote.client.get_title_display()
+        if hasattr(quote.client, "get_title_display")
+        else quote.client.title
+    )
 
-        value_detection_revit = quote.value_detection_revit
-        value_protection_revit = quote.value_protection_revit
-        value_human_safety_revit = quote.value_human_safety_revit
-        total_value_revit = quote.total_value_revit
-        grand_total = quote.grand_total
+    context = {
+        "quote_date": quote_date_es,
+        "quote_number": (
+            f"COT{quote.quote_number:03d}-"
+            f"{str(quote.quote_year)[-2:]}"
+        ),
 
-        # -------------------------
-        # TEXT FOR SINGLE SERVICE TEMPLATES
-        # -------------------------
+        "client_city": quote.client.city or "",
+        "client_company": quote.client.company or "",
+        "client_title": client_title or "",
+        "client_name": quote.client.full_name or "",
+        "client_position": quote.client.position or "",
 
-        total_value_text = f"El valor todal de la propuesta es {format_currency(quote.total_value)}"
-        total_value_text_revit = f"El valor total de la propuesta es {format_currency(total_value_revit)}"
+        "project_name_upper": (
+            quote.project_name or ""
+        ).upper(),
 
-        # -------------------------
-        # DELIVERY TIME TEXT
-        # -------------------------
-        valor = quote.delivery_time_value or 0
+        "project_name": quote.project_name or "",
 
-        # Forzar minúsculas en unidad
-        unidad = (quote.get_delivery_time_unit_display() or "").lower()
+        "reference_norms": reference_norms,
+        "client_requirements": format_bullets(
+            client_requirements
+        ),
+        "items_human_safety": format_bullets(
+            items_human_safety
+        ),
+        "items_protection": format_bullets(
+            items_protection
+        ),
+        "items_detection": format_bullets(
+            items_detection
+        ),
 
-        # Número en letras
-        valor_letras = numero_a_texto(valor)
+        "sh_to_detection_space": "",
 
-        delivery_time_text = f"{valor_letras} ({valor}) {unidad} a partir del pago del anticipo."
-        total_value_text = build_total_text(quote.total_value)
-        total_value_text_revit = build_total_text(total_value_revit)
+        **notes_variables,
 
-        # Context data for the Word template
-        context = {
-            "quote_date": quote_date_es,
-            "quote_number": f"COT{quote.quote_number:03d}-{str(quote.quote_year)[-2:]}",
+        "payment_schedule": build_payment_schedule(
+            quote.payment_advance,
+            quote.payment_first_version,
+            quote.payment_final,
+        ),
 
-            "client_city": getattr(quote.client, "city", "") or "",
-            "client_company": getattr(quote.client, "company", "") or "",
-            "client_title": client_title,
-            "client_name": quote.client.full_name,
-            "client_position": getattr(quote.client, "position", "") or "",
+        "delivery_time_text": delivery_time_text,
+        "current_year": current_year,
 
-            "project_name_upper": (quote.project_name or "").upper(),
-            "project_name": quote.project_name,
+        "value_protection": format_currency(
+            quote.value_protection
+        ),
+        "value_detection": format_currency(
+            quote.value_detection
+        ),
+        "value_human_safety": format_currency(
+            quote.value_human_safety
+        ),
+        "total_value": format_currency(
+            quote.total_value
+        ),
+        "total_value_text": build_total_text(
+            quote.total_value
+        ),
 
-            "reference_norms": reference_norms,
-            "client_requirements": format_bullets(client_requirements),
-            "items_human_safety": format_bullets(items_human_safety),
-            "items_protection": format_bullets(items_protection),
-            "items_detection": format_bullets(items_detection),
-            "sh_to_detection_space": "",
-            **notes_variables,
-            "payment_schedule": build_payment_schedule(
-                quote.payment_advance,
-                quote.payment_first_version,
-                quote.payment_final,
+        "value_detection_revit": format_currency(
+            quote.value_detection_revit
+        ),
+        "value_protection_revit": format_currency(
+            quote.value_protection_revit
+        ),
+        "value_human_safety_revit": format_currency(
+            quote.value_human_safety_revit
+        ),
+        "total_value_revit": format_currency(
+            quote.total_value_revit
+        ),
+        "total_value_text_revit": build_total_text(
+            quote.total_value_revit
+        ),
+
+        "grand_total": format_currency(
+            quote.grand_total
+        ),
+    }
+
+    output_filename = build_output_filename(quote)
+
+    output_directory = os.path.join(
+        settings.BASE_DIR,
+        "generated_docs",
+    )
+
+    os.makedirs(
+        output_directory,
+        exist_ok=True,
+    )
+
+    output_path = os.path.join(
+        output_directory,
+        output_filename,
+    )
+
+    from .services.document_service import generate_doc
+
+    generate_doc(
+        template_path,
+        context,
+        output_path,
+    )
+
+    with open(output_path, "rb") as generated_file:
+        response = HttpResponse(
+            generated_file.read(),
+            content_type=(
+                "application/vnd.openxmlformats-officedocument."
+                "wordprocessingml.document"
             ),
+        )
 
-            "delivery_time_text": delivery_time_text,
-            "current_year": current_year,
+    response["Content-Disposition"] = (
+        f'attachment; filename="{output_filename}"'
+    )
 
-            # -------------------------
-            # AUTOCAD
-            # -------------------------
-            "value_protection": format_currency(quote.value_protection),
-            "value_detection": format_currency(quote.value_detection),
-            "value_human_safety": format_currency(quote.value_human_safety),
-            "total_value": format_currency(quote.total_value),
-            "total_value_text": total_value_text,
+    return response
 
-            # -------------------------
-            # REVIT
-            # -------------------------
-            "value_detection_revit": format_currency(value_detection_revit),
-            "value_protection_revit": format_currency(value_protection_revit),
-            "value_human_safety_revit": format_currency(value_human_safety_revit),
-            "total_value_revit": format_currency(total_value_revit),
-            "total_value_text_revit": total_value_text_revit,
+# View: manage quote details and generate the final Word document
+def quote_details(request, quote_id):
+    quote = get_object_or_404(
+        Quote.objects.select_related("client"),
+        id=quote_id,
+    )
 
-            # OPTIONAL
-            "grand_total": format_currency(grand_total),
-        }
+    norms = Norm.objects.all().order_by("order")
 
-        # Save the generated .docx file to the output directory
-        safe_client_name = "".join(c for c in quote.client.full_name if c.isalnum() or c in (" ", "_")).strip().replace(
-            " ", "_")
-        safe_project = "".join(c for c in quote.project_name if c.isalnum() or c in (" ", "_")).strip().replace(" ",
-                                                                                                                "_")
-        output_filename = build_output_filename(quote)
-        os.makedirs(os.path.join(settings.BASE_DIR, "generated_docs"), exist_ok=True)
-        output_path = os.path.join(settings.BASE_DIR, "generated_docs", output_filename)
+    if request.method == "POST":
+        save_quote_details(quote, request)
 
-        from .services.document_service import generate_doc
+        action = request.POST.get(
+            "form_action",
+            "generate",
+        )
 
-        generate_doc(template_path, context, output_path)
-
-        # Return the generated file as a downloadable response
-        with open(output_path, "rb") as f:
-            response = HttpResponse(
-                f.read(),
-                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        if action == "save":
+            messages.success(
+                request,
+                "Cotización actualizada correctamente.",
             )
-            response["Content-Disposition"] = f'attachment; filename="{output_filename}"'
-            return response
 
-    # On GET: render quote detail page with all norms and notes
-    notes_range = range(1, 11)
-    # Pass all norms to the template and mark the selected or default ones as checked
-    selected_norm_ids = set(quote.norms.values_list('id', flat=True))
-    selected_services = []
+            return redirect(
+                "quote_info",
+                quote_id=quote.id,
+            )
 
-    if quote.is_detection:
-        selected_services.append("detection")
-    if quote.is_protection:
-        selected_services.append("protection")
-    if quote.is_human_safety:
-        selected_services.append("human_safety")
+        try:
+            return generate_quote_response(quote)
+
+        except FileNotFoundError as error:
+            messages.error(
+                request,
+                str(error),
+            )
+
+            return redirect(
+                "quote_details",
+                quote_id=quote.id,
+            )
+
+        except Exception as error:
+            messages.error(
+                request,
+                f"No fue posible generar el documento: {error}",
+            )
+
+            return redirect(
+                "quote_details",
+                quote_id=quote.id,
+            )
+
+    selected_norm_ids = set(
+        quote.norms.values_list(
+            "id",
+            flat=True,
+        )
+    )
 
     default_norm_ids = set()
 
-    if quote.is_detection:
-        default_norm_ids.update(
-            Norm.objects.filter(default_detection=True).values_list("id", flat=True)
-        )
+    # Use service defaults only when no norms have been saved yet.
+    if not selected_norm_ids:
+        if quote.is_detection:
+            default_norm_ids.update(
+                Norm.objects.filter(
+                    default_detection=True
+                ).values_list(
+                    "id",
+                    flat=True,
+                )
+            )
 
-    if quote.is_protection:
-        default_norm_ids.update(
-            Norm.objects.filter(default_protection=True).values_list("id", flat=True)
-        )
+        if quote.is_protection:
+            default_norm_ids.update(
+                Norm.objects.filter(
+                    default_protection=True
+                ).values_list(
+                    "id",
+                    flat=True,
+                )
+            )
 
-    if quote.is_human_safety:
-        default_norm_ids.update(
-            Norm.objects.filter(default_human_safety=True).values_list("id", flat=True)
+        if quote.is_human_safety:
+            default_norm_ids.update(
+                Norm.objects.filter(
+                    default_human_safety=True
+                ).values_list(
+                    "id",
+                    flat=True,
+                )
+            )
+
+    saved_notes = list(
+        enumerate(
+            quote.additional_notes or [],
+            start=1,
         )
+    )
 
     return render(
         request,
         "quotes/quote_details.html",
         {
             "quote": quote,
-            "notes_range": notes_range,
+            "notes_range": range(1, 11),
             "norms": norms,
             "selected_norm_ids": selected_norm_ids,
             "default_norm_ids": default_norm_ids,
+            "saved_notes": saved_notes,
+            "saved_notes_count": len(saved_notes),
+            "edit_mode": False,
+        },
+    )
+
+def quote_update(request, quote_id):
+    quote = get_object_or_404(Quote, id=quote_id)
+    norms = Norm.objects.all().order_by("order")
+
+    if request.method == "POST":
+        save_quote_details(quote, request)
+
+        messages.success(
+            request,
+            "Cotización actualizada correctamente.",
+        )
+
+        return redirect(
+            "quote_info",
+            quote_id=quote.id,
+        )
+
+    selected_norm_ids = set(
+        quote.norms.values_list("id", flat=True)
+    )
+
+    saved_notes = list(
+        enumerate(
+            quote.additional_notes or [],
+            start=1,
+        )
+    )
+
+    return render(
+        request,
+        "quotes/quote_details.html",
+        {
+            "quote": quote,
+            "norms": norms,
+            "notes_range": range(1, 11),
+            "selected_norm_ids": selected_norm_ids,
+            "default_norm_ids": set(),
+            "saved_notes": saved_notes,
+            "saved_notes_count": len(saved_notes),
+            "edit_mode": True,
         },
     )
 
@@ -689,6 +880,69 @@ def quote_info(request, quote_id):
             "total_revit": format_currency(quote.total_value_revit),
         }
     )
+
+def quote_download(request, quote_id):
+    quote = get_object_or_404(
+        Quote.objects.select_related("client"),
+        id=quote_id,
+    )
+
+    try:
+        return generate_quote_response(quote)
+
+    except FileNotFoundError as error:
+        messages.error(
+            request,
+            str(error),
+        )
+
+        return redirect(
+            "quote_info",
+            quote_id=quote.id,
+        )
+
+    except Exception as error:
+        messages.error(
+            request,
+            f"No fue posible generar el documento: {error}",
+        )
+
+        return redirect(
+            "quote_info",
+            quote_id=quote.id,
+        )
+
+def quote_download(request, quote_id):
+    quote = get_object_or_404(
+        Quote.objects.select_related("client"),
+        id=quote_id,
+    )
+
+    try:
+        return generate_quote_response(quote)
+
+    except FileNotFoundError as error:
+        messages.error(
+            request,
+            str(error),
+        )
+
+        return redirect(
+            "quote_info",
+            quote_id=quote.id,
+        )
+
+    except Exception as error:
+        messages.error(
+            request,
+            f"No fue posible generar el documento: {error}",
+        )
+
+        return redirect(
+            "quote_info",
+            quote_id=quote.id,
+        )
+
 
 def quote_delete(request, quote_id):
     quote = get_object_or_404(Quote, id=quote_id)

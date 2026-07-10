@@ -40,6 +40,22 @@
 
 <div class="card p-4">
 
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h4 class="mb-0">
+            Información de la cotización
+        </h4>
+
+        <a
+            href="{% url 'quote_update' quote.id %}"
+            class="btn btn-outline-danger"
+            onclick="return confirm('¿Deseas editar esta cotización?');"
+        >
+            Editar
+        </a>
+
+    </div>
+
     <p>
         <strong>Número de cotización:</strong>
         COT{{ quote.quote_number|stringformat:"03d" }}-{{ quote.quote_year|stringformat:"s"|slice:"-2:" }}
@@ -55,7 +71,6 @@
     </p>
 
     <p><strong>Empresa:</strong> {{ quote.client.company }}</p>
-    <p><strong>Tipo de construcción:</strong> {{ quote.get_building_type_display }}</p>
 
     {% if quote.deliver_autocad %}
         <p><strong>Total AutoCAD:</strong> {{ total_autocad }}</p>
@@ -82,25 +97,42 @@
         {% if quote.deliver_revit %}<li>Revit</li>{% endif %}
     </ul>
 
-        <div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="d-flex justify-content-between align-items-center mt-4">
 
-        <a href="{% url 'home' %}" class="btn btn-home">
-            Volver al inicio
+    <a
+        href="{% url 'home' %}"
+        class="btn btn-home"
+    >
+        Volver al inicio
+    </a>
+
+    <div class="d-flex gap-2">
+
+        <a
+            href="{% url 'quote_download' quote.id %}"
+            class="btn btn-primary"
+        >
+            Descargar cotización
         </a>
 
         <form
             method="POST"
             action="{% url 'quote_delete' quote.id %}"
-            onsubmit="return confirm('¿Seguro que deseas eliminar esta cotización?');">
-
+            onsubmit="return confirm('¿Deseas eliminar esta cotización? Esta acción no se puede deshacer.');"
+        >
             {% csrf_token %}
 
-            <button type="submit" class="btn btn-delete">
+            <button
+                type="submit"
+                class="btn btn-delete"
+            >
                 Eliminar cotización
             </button>
         </form>
 
     </div>
+
+</div>
 
 </div>
 

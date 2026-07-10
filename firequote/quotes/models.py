@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 
 TITLE_CHOICES = [
     ('senor', 'Señor'),
@@ -97,6 +96,8 @@ class Quote(models.Model):
     manual_items_sh = models.TextField(blank=True)
     manual_items_detection = models.TextField(blank=True)
     manual_items_protection = models.TextField(blank=True)
+
+    additional_notes = models.JSONField(default=list, blank=True)
 
     # Payment schedule
     payment_advance = models.DecimalField(max_digits=5, decimal_places=2, default=40.00)
