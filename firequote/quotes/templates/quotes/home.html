@@ -43,6 +43,14 @@
     <a href="{% url 'client_list' %}" class="btn btn-primary home-btn w-100">Buscar Cliente</a>
     <a href="{% url 'quote_list' %}" class="btn btn-primary home-btn w-100">Buscar Cotización</a>
     <a href="{% url 'quote_form' %}" class="btn btn-primary home-btn w-100">Generar Cotización</a>
+    {% if can_download_backup %}
+        <a href="{% url 'download_backup' %}"
+           class="btn btn-outline-danger w-100 mt-3 py-3 fw-bold">
+
+            Descargar respaldo
+
+        </a>
+    {% endif %}
 </div>
 
 <div class="home-actions">

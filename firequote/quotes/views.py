@@ -26,6 +26,13 @@ Handles quote creation, editing, and document generation (.docx)
 for the FireQuote Django web application.
 """
 
+import gzip
+from io import StringIO
+
+from django.core.management import call_command
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils import timezone
+
 # View: displays and handles the quote creation form
 def quote_form(request):
     clients = Client.objects.all()  # populate dropdown with existing clients
@@ -79,9 +86,6 @@ def quote_form(request):
             service_tag=service_tag,
             delivery_time_value=delivery_time_value,
             delivery_time_unit=delivery_time_unit,
-
-            building_type=request.POST.get("building_type"),
-            area_sqm=float(request.POST.get("m2", 0)),
 
             is_detection=('is_detection' in request.POST),
             is_protection=('is_protection' in request.POST),
@@ -554,7 +558,23 @@ def quote_details(request, quote_id):
     )
 
 def home(request):
-    return render(request, "quotes/home.html")
+    can_download_backup = (
+        request.user.is_authenticated
+        and (
+            request.user.is_superuser
+            or request.user.groups.filter(
+                name="User Managers"
+            ).exists()
+        )
+    )
+
+    return render(
+        request,
+        "quotes/home.html",
+        {
+            "can_download_backup": can_download_backup,
+        },
+    )
 
 
 def client_list(request):
@@ -705,3 +725,43 @@ def client_update(request, client_id):
             "client": client,
         }
     )
+
+def can_download_backup(user):
+    return user.is_authenticated and (
+        user.is_superuser
+        or user.groups.filter(name="User Managers").exists()
+    )
+
+
+@login_required
+@user_passes_test(can_download_backup)
+def download_backup(request):
+    output = StringIO()
+
+    call_command(
+        "dumpdata",
+        "quotes.client",
+        "quotes.quote",
+        "quotes.norm",
+        "quotes.templatedoc",
+        "quotes.quotecounter",
+        indent=2,
+        stdout=output,
+    )
+
+    json_bytes = output.getvalue().encode("utf-8")
+    compressed_backup = gzip.compress(json_bytes, compresslevel=9)
+
+    backup_date = timezone.localdate().strftime("%Y-%m-%d")
+    filename = f"firequote_backup_{backup_date}.json.gz"
+
+    response = HttpResponse(
+        compressed_backup,
+        content_type="application/gzip",
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    return response
