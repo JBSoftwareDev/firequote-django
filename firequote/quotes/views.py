@@ -912,38 +912,6 @@ def quote_download(request, quote_id):
             quote_id=quote.id,
         )
 
-def quote_download(request, quote_id):
-    quote = get_object_or_404(
-        Quote.objects.select_related("client"),
-        id=quote_id,
-    )
-
-    try:
-        return generate_quote_response(quote)
-
-    except FileNotFoundError as error:
-        messages.error(
-            request,
-            str(error),
-        )
-
-        return redirect(
-            "quote_info",
-            quote_id=quote.id,
-        )
-
-    except Exception as error:
-        messages.error(
-            request,
-            f"No fue posible generar el documento: {error}",
-        )
-
-        return redirect(
-            "quote_info",
-            quote_id=quote.id,
-        )
-
-
 def quote_delete(request, quote_id):
     quote = get_object_or_404(Quote, id=quote_id)
 

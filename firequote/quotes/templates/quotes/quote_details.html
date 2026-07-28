@@ -105,23 +105,6 @@
             <div class="form-check">
                 <input
                     type="checkbox"
-                    name="is_detection"
-                    id="is_detection"
-                    class="form-check-input"
-                    {% if quote.is_detection %}checked{% endif %}
-                >
-
-                <label
-                    class="form-check-label"
-                    for="is_detection"
-                >
-                    Detección
-                </label>
-            </div>
-
-            <div class="form-check">
-                <input
-                    type="checkbox"
                     name="is_protection"
                     id="is_protection"
                     class="form-check-input"
@@ -133,6 +116,23 @@
                     for="is_protection"
                 >
                     Extinción
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    name="is_detection"
+                    id="is_detection"
+                    class="form-check-input"
+                    {% if quote.is_detection %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="is_detection"
+                >
+                    Detección
                 </label>
             </div>
 
@@ -217,32 +217,10 @@
         <hr>
         {% endif %}
 
-        {% if quote.is_detection %}
-        <div class="form-section">
-            <h5>Detección de incendios</h5>
-            <div class="form-check mb-2">
-                <input
-                    type="checkbox"
-                    id="add_detection"
-                    class="form-check-input"
-                    onclick="toggleTextarea('add_detection','manual_items_detection')"
-                    {% if quote.manual_items_detection %}checked{% endif %}
-                >
-                <label class="form-check-label" for="add_detection">Agregar entregabless manualmente</label>
-            </div>
-            <textarea
-                id="manual_items_detection"
-                name="manual_items_detection"
-                class="form-control"
-                placeholder="Entregables adicionales de detección..."
-                {% if not quote.manual_items_detection %}disabled{% endif %}
-            >{{ quote.manual_items_detection }}</textarea>
-        </div>
-        {% endif %}
-
         {% if quote.is_protection %}
         <div class="form-section">
             <h5>Extinción de incendios</h5>
+
             <div class="form-check mb-2">
                 <input
                     type="checkbox"
@@ -251,8 +229,15 @@
                     onclick="toggleTextarea('add_protection','manual_items_protection')"
                     {% if quote.manual_items_protection %}checked{% endif %}
                 >
-                <label class="form-check-label" for="add_protection">Agregar entregables manualmente</label>
+
+                <label
+                    class="form-check-label"
+                    for="add_protection"
+                >
+                    Agregar entregables manualmente
+                </label>
             </div>
+
             <textarea
                 id="manual_items_protection"
                 name="manual_items_protection"
@@ -263,9 +248,41 @@
         </div>
         {% endif %}
 
+        {% if quote.is_detection %}
+        <div class="form-section">
+            <h5>Detección de incendios</h5>
+
+            <div class="form-check mb-2">
+                <input
+                    type="checkbox"
+                    id="add_detection"
+                    class="form-check-input"
+                    onclick="toggleTextarea('add_detection','manual_items_detection')"
+                    {% if quote.manual_items_detection %}checked{% endif %}
+                >
+
+                <label
+                    class="form-check-label"
+                    for="add_detection"
+                >
+                    Agregar entregables manualmente
+                </label>
+            </div>
+
+            <textarea
+                id="manual_items_detection"
+                name="manual_items_detection"
+                class="form-control"
+                placeholder="Entregables adicionales de detección..."
+                {% if not quote.manual_items_detection %}disabled{% endif %}
+            >{{ quote.manual_items_detection }}</textarea>
+        </div>
+        {% endif %}
+
         {% if quote.is_human_safety %}
         <div class="form-section">
             <h5>Seguridad Humana</h5>
+
             <div class="form-check mb-2">
                 <input
                     type="checkbox"
@@ -274,8 +291,15 @@
                     onclick="toggleTextarea('add_sh','manual_items_sh')"
                     {% if quote.manual_items_sh %}checked{% endif %}
                 >
-                <label class="form-check-label" for="add_sh">Agregar entregables manualmente</label>
+
+                <label
+                    class="form-check-label"
+                    for="add_sh"
+                >
+                    Agregar entregables manualmente
+                </label>
             </div>
+
             <textarea
                 id="manual_items_sh"
                 name="manual_items_sh"
@@ -298,29 +322,16 @@
     {% endif %}
 
     {% if quote.deliver_autocad %}
-        {% if quote.is_detection %}
-        <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor detección</label>
-            <div class="col-md-4 input-group">
-                <span class="input-group-text">$</span>
-                <input
-                    type="number"
-                    name="value_detection"
-                    class="form-control"
-                    value="{{ quote.value_detection|floatformat:'0' }}"
-                    min="0"
-                    step="1"
-                    required
-                >
-            </div>
-        </div>
-        {% endif %}
 
         {% if quote.is_protection %}
         <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor extinción</label>
+            <label class="col-md-4 form-label mb-0">
+                Valor extinción
+            </label>
+
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
+
                 <input
                     type="number"
                     name="value_protection"
@@ -334,11 +345,37 @@
         </div>
         {% endif %}
 
-        {% if quote.is_human_safety %}
+        {% if quote.is_detection %}
         <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
+            <label class="col-md-4 form-label mb-0">
+                Valor detección
+            </label>
+
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
+
+                <input
+                    type="number"
+                    name="value_detection"
+                    class="form-control"
+                    value="{{ quote.value_detection|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_human_safety %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">
+                Valor seguridad humana
+            </label>
+
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+
                 <input
                     type="number"
                     name="value_human_safety"
@@ -351,6 +388,7 @@
             </div>
         </div>
         {% endif %}
+
     {% endif %}
 
     {% if quote.deliver_autocad and quote.deliver_revit %}
@@ -358,29 +396,16 @@
     {% endif %}
 
     {% if quote.deliver_revit %}
-        {% if quote.is_detection %}
-        <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor detección</label>
-            <div class="col-md-4 input-group">
-                <span class="input-group-text">$</span>
-                <input
-                    type="number"
-                    name="value_detection_revit"
-                    class="form-control"
-                    value="{{ quote.value_detection_revit|floatformat:'0' }}"
-                    min="0"
-                    step="1"
-                    required
-                >
-            </div>
-        </div>
-        {% endif %}
 
         {% if quote.is_protection %}
         <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor extinción</label>
+            <label class="col-md-4 form-label mb-0">
+                Valor extinción
+            </label>
+
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
+
                 <input
                     type="number"
                     name="value_protection_revit"
@@ -394,11 +419,37 @@
         </div>
         {% endif %}
 
-        {% if quote.is_human_safety %}
+        {% if quote.is_detection %}
         <div class="row align-items-center mb-2">
-            <label class="col-md-4 form-label mb-0">Valor seguridad humana</label>
+            <label class="col-md-4 form-label mb-0">
+                Valor detección
+            </label>
+
             <div class="col-md-4 input-group">
                 <span class="input-group-text">$</span>
+
+                <input
+                    type="number"
+                    name="value_detection_revit"
+                    class="form-control"
+                    value="{{ quote.value_detection_revit|floatformat:'0' }}"
+                    min="0"
+                    step="1"
+                    required
+                >
+            </div>
+        </div>
+        {% endif %}
+
+        {% if quote.is_human_safety %}
+        <div class="row align-items-center mb-2">
+            <label class="col-md-4 form-label mb-0">
+                Valor seguridad humana
+            </label>
+
+            <div class="col-md-4 input-group">
+                <span class="input-group-text">$</span>
+
                 <input
                     type="number"
                     name="value_human_safety_revit"
@@ -411,6 +462,7 @@
             </div>
         </div>
         {% endif %}
+
     {% endif %}
 </div>
 

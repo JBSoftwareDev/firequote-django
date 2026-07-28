@@ -85,10 +85,19 @@
     <hr>
 
     <p><strong>Servicios:</strong></p>
+
     <ul>
-        {% if quote.is_detection %}<li>Detección</li>{% endif %}
-        {% if quote.is_protection %}<li>Extinción</li>{% endif %}
-        {% if quote.is_human_safety %}<li>Seguridad Humana</li>{% endif %}
+        {% if quote.is_protection %}
+            <li>Extinción</li>
+        {% endif %}
+
+        {% if quote.is_detection %}
+            <li>Detección</li>
+        {% endif %}
+
+        {% if quote.is_human_safety %}
+            <li>Seguridad Humana</li>
+        {% endif %}
     </ul>
 
     <p><strong>Formatos:</strong></p>
