@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.db.models import Q
 import locale
 import os
-from .models import Quote, Client, Norm, TemplateDoc
+from .models import Quote, Client, Norm, TemplateDoc, QuoteCounter
 from django.conf import settings
 from docxtpl import Listing, RichText
 from decimal import Decimal
@@ -32,15 +32,12 @@ Handles quote creation, editing, and document generation (.docx)
 for the FireQuote Django web application.
 """
 
-import gzip
+import zlib
+
+from django.core import serializers
+from django.http import StreamingHttpResponse
+
 import logging
-import tempfile
-
-from io import TextIOWrapper
-
-from django.http import FileResponse
-
-from django.core.management import call_command
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 
@@ -1031,68 +1028,116 @@ def generate_quotes_report(request):
 @user_passes_test(can_download_backup)
 def download_backup(request):
     """
-    Genera un respaldo comprimido sin mantener todo el JSON
-    simultáneamente en la memoria del servidor.
+    Descarga un fixture JSON comprimido progresivamente.
+
+    Los registros se leen y envían por bloques pequeños para evitar
+    cargar toda la base de datos en la memoria del servidor.
     """
-    try:
-        # Mantiene archivos pequeños en memoria y mueve los grandes
-        # automáticamente a un archivo temporal en disco.
-        backup_file = tempfile.SpooledTemporaryFile(
-            max_size=5 * 1024 * 1024,
-            mode="w+b",
-        )
 
-        # Gzip escribe la información comprimida progresivamente.
-        with gzip.GzipFile(
-            fileobj=backup_file,
-            mode="wb",
-            compresslevel=5,
-        ) as gzip_file:
+    def generate_json_fixture():
+        """
+        Produce un fixture JSON válido compatible con loaddata.
+        """
+        yield b"[\n"
 
-            # dumpdata escribe texto, por eso envolvemos gzip
-            # en un stream de texto UTF-8.
-            with TextIOWrapper(
-                gzip_file,
-                encoding="utf-8",
-                write_through=True,
-            ) as text_output:
+        first_object = True
 
-                call_command(
-                    "dumpdata",
-                    "quotes.client",
-                    "quotes.quote",
-                    "quotes.norm",
-                    "quotes.templatedoc",
-                    "quotes.quotecounter",
-                    indent=2,
-                    stdout=text_output,
+        model_querysets = [
+            Client.objects.all().order_by("id").iterator(
+                chunk_size=200
+            ),
+
+            Norm.objects.all().order_by("id").iterator(
+                chunk_size=200
+            ),
+
+            TemplateDoc.objects.all().order_by("id").iterator(
+                chunk_size=100
+            ),
+
+            QuoteCounter.objects.all().order_by("id").iterator(
+                chunk_size=100
+            ),
+
+            Quote.objects.select_related(
+                "client",
+                "template_doc",
+            ).prefetch_related(
+                "norms"
+            ).order_by(
+                "id"
+            ).iterator(
+                chunk_size=50
+            ),
+        ]
+
+        for queryset in model_querysets:
+            for instance in queryset:
+                serialized = serializers.serialize(
+                    "json",
+                    [instance],
+                    use_natural_foreign_keys=False,
+                    use_natural_primary_keys=False,
                 )
 
-        backup_file.seek(0)
+                # serializers.serialize devuelve:
+                # [{"model": ..., "pk": ..., "fields": ...}]
+                # Quitamos los corchetes externos para construir
+                # un único fixture con todos los registros.
+                serialized_object = serialized[1:-1].strip()
 
-        backup_date = timezone.localdate().strftime(
-            "%Y-%m-%d"
+                if not serialized_object:
+                    continue
+
+                if not first_object:
+                    yield b",\n"
+
+                yield serialized_object.encode("utf-8")
+                first_object = False
+
+        yield b"\n]"
+
+    def generate_compressed_backup():
+        """
+        Comprime progresivamente sin guardar el resultado completo
+        en memoria ni en una variable.
+        """
+        compressor = zlib.compressobj(
+            level=5,
+            method=zlib.DEFLATED,
+            wbits=31,  # Genera formato gzip.
         )
 
-        filename = (
-            f"firequote_backup_{backup_date}.json.gz"
-        )
+        for json_chunk in generate_json_fixture():
+            compressed_chunk = compressor.compress(
+                json_chunk
+            )
 
-        return FileResponse(
-            backup_file,
-            as_attachment=True,
-            filename=filename,
-            content_type="application/gzip",
-        )
+            if compressed_chunk:
+                yield compressed_chunk
 
-    except Exception as error:
-        logger.exception(
-            "Error generating FireQuote backup"
-        )
+        final_chunk = compressor.flush()
 
-        messages.error(
-            request,
-            f"No fue posible generar el respaldo: {error}",
-        )
+        if final_chunk:
+            yield final_chunk
 
-        return redirect("home")
+    backup_date = timezone.localdate().strftime(
+        "%Y-%m-%d"
+    )
+
+    filename = (
+        f"firequote_backup_{backup_date}.json.gz"
+    )
+
+    response = StreamingHttpResponse(
+        streaming_content=generate_compressed_backup(),
+        content_type="application/gzip",
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    response["X-Content-Type-Options"] = "nosniff"
+
+    return response
