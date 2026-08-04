@@ -34,4 +34,10 @@ urlpatterns = [
         name="quote_download",
     ),
 
+    path(
+        "cotizaciones/generar-reporte/",
+        views.generate_quotes_report,
+        name="generate_quotes_report",
+    ),
+
 ]

@@ -977,8 +977,21 @@ def generate_quotes_report(request):
 
     quotes = (
         Quote.objects
-        .select_related("client")
-        .order_by("created_at", "id")
+        .select_related(
+            "client",
+            "template_doc",
+        )
+        .prefetch_related("norms")
+        .filter(
+            quote_year__isnull=False,
+            quote_year__gte=2026,
+        )
+        .order_by(
+            "quote_year",
+            "quote_number",
+            "created_at",
+            "id",
+        )
     )
 
     try:

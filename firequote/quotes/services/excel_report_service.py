@@ -7,7 +7,8 @@ from unicodedata import combining, normalize
 from django.conf import settings
 from openpyxl import load_workbook
 from openpyxl.cell.cell import MergedCell
-from openpyxl.styles import Font
+
+from .quote_service import build_output_filename
 
 
 TEMPLATE_SHEET_NAME = "2026"
@@ -94,15 +95,22 @@ def write_value(
     )
 
 
-def copy_row_style(worksheet, source_row, target_row):
+def copy_row_style(
+    worksheet,
+    source_row,
+    target_row,
+):
     """
-    Copia el formato de la fila modelo a una fila nueva.
+    Copia exactamente el formato de la fila modelo.
     """
     worksheet.row_dimensions[target_row].height = (
         worksheet.row_dimensions[source_row].height
     )
 
-    for column_number in range(1, worksheet.max_column + 1):
+    for column_number in range(
+        1,
+        worksheet.max_column + 1,
+    ):
         source_cell = worksheet.cell(
             row=source_row,
             column=column_number,
@@ -113,37 +121,21 @@ def copy_row_style(worksheet, source_row, target_row):
             column=column_number,
         )
 
-        if source_cell.has_style:
-            target_cell.font = copy(source_cell.font)
-            target_cell.fill = copy(source_cell.fill)
-            target_cell.border = copy(source_cell.border)
-            target_cell.alignment = copy(source_cell.alignment)
-            target_cell.number_format = source_cell.number_format
-            target_cell.protection = copy(source_cell.protection)
-
-        if source_cell.hyperlink:
-            target_cell._hyperlink = copy(source_cell.hyperlink)
-
-def apply_data_font(worksheet, row_number):
-    """
-    Aplica a las celdas de datos la fuente utilizada
-    tradicionalmente en el archivo de seguimiento.
-    """
-    for column_number in range(1, worksheet.max_column + 1):
-        cell = worksheet.cell(
-            row=row_number,
-            column=column_number,
-        )
-
-        if isinstance(cell, MergedCell):
+        if isinstance(source_cell, MergedCell):
             continue
 
-        cell.font = Font(
-            name="Cambria",
-            size=11,
-            bold=False,
-            italic=False,
-        )
+        if isinstance(target_cell, MergedCell):
+            continue
+
+        if source_cell.has_style:
+            target_cell._style = copy(
+                source_cell._style
+            )
+
+        if source_cell.hyperlink:
+            target_cell._hyperlink = copy(
+                source_cell.hyperlink
+            )
 
 def clear_data_area(worksheet):
     """
@@ -160,6 +152,64 @@ def clear_data_area(worksheet):
 
             cell.value = None
 
+def find_last_historical_row(worksheet):
+    """
+    Encuentra la última fila que contiene una descripción real.
+
+    La plantilla puede tener números prellenados en filas vacías,
+    por lo que no usamos la columna de número para encontrar
+    la última cotización.
+    """
+    description_column = 3  # Columna C
+    last_historical_row = DATA_START_ROW - 1
+
+    for row_number in range(
+        DATA_START_ROW,
+        worksheet.max_row + 1,
+    ):
+        description = worksheet.cell(
+            row=row_number,
+            column=description_column,
+        ).value
+
+        if description is None:
+            continue
+
+        description_text = str(description).strip()
+
+        if (
+            description_text
+            and description_text.lower() != "nan"
+        ):
+            last_historical_row = row_number
+
+    return last_historical_row
+
+def clear_unused_template_rows(
+    worksheet,
+    start_row,
+):
+    """
+    Elimina valores prellenados después de la última cotización
+    histórica, pero conserva bordes, fuente y formato.
+    """
+    for row_number in range(
+        start_row,
+        worksheet.max_row + 1,
+    ):
+        for column_number in range(
+            2,
+            worksheet.max_column + 1,
+        ):
+            cell = worksheet.cell(
+                row=row_number,
+                column=column_number,
+            )
+
+            if isinstance(cell, MergedCell):
+                continue
+
+            cell.value = None
 
 def update_sheet_title(worksheet, year):
     """
@@ -281,23 +331,20 @@ def create_year_sheet(workbook, template_worksheet, year):
 
 def get_quote_year(quote):
     """
-    Obtiene el año real de la cotización.
+    Devuelve el año oficial asignado por FireQuote.
 
-    Primero intenta usar quote_year, si existe.
-    De lo contrario usa created_at.
+    Los registros históricos importados no tienen quote_year
+    y ya se encuentran dentro de las hojas de la plantilla.
     """
     quote_year = getattr(quote, "quote_year", None)
 
-    if quote_year:
-        try:
-            return int(quote_year)
-        except (TypeError, ValueError):
-            pass
+    if quote_year in (None, ""):
+        return None
 
-    if quote.created_at:
-        return quote.created_at.year
-
-    return None
+    try:
+        return int(quote_year)
+    except (TypeError, ValueError):
+        return None
 
 
 def get_quote_number(quote, fallback_number):
@@ -324,11 +371,16 @@ def get_quote_number(quote, fallback_number):
 
 def get_quote_description(quote):
     """
-    Texto para la columna Descripción de la cotización.
+    Utiliza el mismo nombre generado para el documento Word,
+    pero sin la extensión .docx.
 
-    Actualmente usa el nombre del proyecto.
+    Ejemplo:
+    COTIZACION DE LOS DISEÑOS DE PROTECCIÓN CONTRA INCENDIOS
+    - CENTRO COMERCIAL NORTE
     """
-    return quote.project_name or ""
+    output_filename = build_output_filename(quote)
+
+    return output_filename.removesuffix(".docx")
 
 
 def get_client_company(quote):
@@ -424,20 +476,210 @@ def validate_template_headers(worksheet):
             f"en la fila {HEADER_ROW}: {missing_text}."
         )
 
-
-def fill_year_sheet(worksheet, quotes):
+def write_quote_row(
+    worksheet,
+    target_row,
+    quote,
+    header_columns,
+):
     """
-    Llena una hoja con las cotizaciones de un año.
+    Escribe todos los datos de una cotización en una fila del Excel.
+    """
+
+    # Mostrar solamente la parte numérica:
+    # COT320-26 -> 320
+    quote_number = getattr(
+        quote,
+        "quote_number",
+        None,
+    )
+
+    if quote_number not in (None, ""):
+        try:
+            quote_number = int(quote_number)
+        except (TypeError, ValueError):
+            quote_number = ""
+    else:
+        quote_number = ""
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote_number,
+        "Número de cotización",
+        "Numero de cotizacion",
+        "Número",
+        "Numero",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        get_quote_description(quote),
+        "Descripción de la cotización",
+        "Descripcion de la cotizacion",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        get_client_company(quote),
+        "Cliente",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        get_quote_value(quote),
+        "Valor sin IVA",
+    )
+
+    quote_date = (
+        quote.created_at.date()
+        if quote.created_at
+        else None
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote_date,
+        "Fecha de cotización",
+        "Fecha de cotizacion",
+        "Fecha cotización",
+        "Fecha cotizacion",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        get_approved_text(quote),
+        "Aprobado",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote.client.phone or "",
+        "Teléfono",
+        "Telefono",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote.client.full_name or "",
+        "Persona Encargada",
+        "Persona encargada",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote.client.position or "",
+        "Cargo",
+    )
+
+    write_value(
+        worksheet,
+        target_row,
+        header_columns,
+        quote.client.email or "",
+        "Correo",
+        "Email",
+    )
+
+    # Formato de fecha
+    date_column = find_column(
+        header_columns,
+        "Fecha de cotización",
+        "Fecha de cotizacion",
+        "Fecha cotización",
+        "Fecha cotizacion",
+    )
+
+    if date_column:
+        worksheet.cell(
+            row=target_row,
+            column=date_column,
+        ).number_format = "m/d/yyyy"
+
+    # Formato monetario
+    value_column = find_column(
+        header_columns,
+        "Valor sin IVA",
+    )
+
+    if value_column:
+        worksheet.cell(
+            row=target_row,
+            column=value_column,
+        ).number_format = '$#,##0'
+
+def append_2026_quotes(
+    worksheet,
+    quotes,
+):
+    """
+    Conserva las cotizaciones históricas 1-315 de la plantilla
+    y agrega después las cotizaciones nuevas de FireQuote.
+    """
+    header_columns = get_header_columns(worksheet)
+
+    last_historical_row = find_last_historical_row(
+        worksheet
+    )
+
+    first_new_row = last_historical_row + 1
+
+    # Borra números y otros valores prellenados de filas vacías.
+    clear_unused_template_rows(
+        worksheet=worksheet,
+        start_row=first_new_row,
+    )
+
+    for index, quote in enumerate(quotes):
+        target_row = first_new_row + index
+
+        copy_row_style(
+            worksheet=worksheet,
+            source_row=DATA_START_ROW,
+            target_row=target_row,
+        )
+
+        write_quote_row(
+            worksheet=worksheet,
+            target_row=target_row,
+            quote=quote,
+            header_columns=header_columns,
+        )
+
+def fill_year_sheet(
+    worksheet,
+    quotes,
+):
+    """
+    Limpia y llena completamente una hoja anual nueva.
+    Se usa para 2027 y años posteriores.
     """
     clear_data_area(worksheet)
 
-    header_columns = get_header_columns(worksheet)
+    header_columns = get_header_columns(
+        worksheet
+    )
 
     for index, quote in enumerate(quotes):
         target_row = DATA_START_ROW + index
 
-        # Si se supera el número de filas ya formateadas,
-        # copia la fila modelo.
         if target_row != DATA_START_ROW:
             copy_row_style(
                 worksheet=worksheet,
@@ -445,133 +687,11 @@ def fill_year_sheet(worksheet, quotes):
                 target_row=target_row,
             )
 
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            get_quote_number(
-                quote=quote,
-                fallback_number=index + 1,
-            ),
-            "Número de cotización",
-            "Numero de cotizacion",
-            "Número",
-            "Numero",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            get_quote_description(quote),
-            "Descripción de la cotización",
-            "Descripcion de la cotizacion",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            get_client_company(quote),
-            "Cliente",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            get_quote_value(quote),
-            "Valor sin IVA",
-        )
-
-        quote_date = (
-            quote.created_at.date()
-            if quote.created_at
-            else None
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            quote_date,
-            "Fecha de cotización",
-            "Fecha de cotizacion",
-            "Fecha cotización",
-            "Fecha cotizacion",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            get_approved_text(quote),
-            "Aprobado",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            quote.client.phone or "",
-            "Teléfono",
-            "Telefono",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            quote.client.full_name or "",
-            "Persona Encargada",
-            "Persona encargada",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            quote.client.position or "",
-            "Cargo",
-        )
-
-        write_value(
-            worksheet,
-            target_row,
-            header_columns,
-            quote.client.email or "",
-            "Correo",
-            "Email",
-        )
-
-        date_column = find_column(
-            header_columns,
-            "Fecha de cotización",
-            "Fecha de cotizacion",
-            "Fecha cotización",
-            "Fecha cotizacion",
-        )
-
-        if date_column:
-            worksheet.cell(
-                row=target_row,
-                column=date_column,
-            ).number_format = "dd/mm/yyyy"
-
-        value_column = find_column(
-            header_columns,
-            "Valor sin IVA",
-        )
-
-        if value_column:
-            worksheet.cell(
-                row=target_row,
-                column=value_column,
-            ).number_format = '$#,##0'
-
-        apply_data_font(
+        write_quote_row(
             worksheet=worksheet,
-            row_number=target_row,
+            target_row=target_row,
+            quote=quote,
+            header_columns=header_columns,
         )
 
 
@@ -621,18 +741,17 @@ def generate_quotes_excel_report(quotes):
         if year >= 2026:
             quotes_by_year[year].append(quote)
 
-    # La hoja 2026 siempre existe, aunque no haya cotizaciones.
+    # La hoja 2026 ya existe en la plantilla y está vacía.
     update_sheet_title(
         worksheet=template_worksheet,
         year=2026,
     )
 
-    fill_year_sheet(
+    append_2026_quotes(
         worksheet=template_worksheet,
         quotes=quotes_by_year.get(2026, []),
     )
 
-    # Crea únicamente los años posteriores que tengan registros.
     future_years = sorted(
         year
         for year in quotes_by_year
@@ -644,8 +763,11 @@ def generate_quotes_excel_report(quotes):
 
         if sheet_name in workbook.sheetnames:
             year_worksheet = workbook[sheet_name]
-            clear_data_area(year_worksheet)
-            update_sheet_title(year_worksheet, year)
+
+            update_sheet_title(
+                worksheet=year_worksheet,
+                year=year,
+            )
         else:
             year_worksheet = create_year_sheet(
                 workbook=workbook,

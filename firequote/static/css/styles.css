@@ -123,3 +123,37 @@ h4 {
     background-color: #e30613;
     color: #ffffff;
 }
+
+.history-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.generate-report-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: 1px solid #157347;
+    border-radius: 6px;
+    background-color: #198754;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.generate-report-button:hover {
+    background-color: #157347;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.generate-report-button:focus {
+    outline: 3px solid rgba(25, 135, 84, 0.25);
+    outline-offset: 2px;
+}
