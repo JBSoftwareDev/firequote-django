@@ -18,6 +18,12 @@ from .models import Quote, Client, Norm, TemplateDoc
 from django.conf import settings
 from docxtpl import Listing, RichText
 from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+
+from .services.excel_report_service import (
+    generate_quotes_excel_report,
+)
 
 """
 quotes/views.py
@@ -27,11 +33,18 @@ for the FireQuote Django web application.
 """
 
 import gzip
-from io import StringIO
+import logging
+import tempfile
+
+from io import TextIOWrapper
+
+from django.http import FileResponse
 
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 # View: displays and handles the quote creation form
 def quote_form(request):
@@ -954,32 +967,58 @@ def can_download_backup(user):
         or user.groups.filter(name="User Managers").exists()
     )
 
-
 @login_required
-@user_passes_test(can_download_backup)
-def download_backup(request):
-    output = StringIO()
+def generate_quotes_report(request):
+    """
+    Descarga el reporte completo de seguimiento a cotizaciones.
 
-    call_command(
-        "dumpdata",
-        "quotes.client",
-        "quotes.quote",
-        "quotes.norm",
-        "quotes.templatedoc",
-        "quotes.quotecounter",
-        indent=2,
-        stdout=output,
+    Conserva las hojas históricas de la plantilla y actualiza
+    automáticamente las hojas desde 2026 en adelante.
+    """
+    if request.method != "GET":
+        return redirect("quote_list")
+
+    quotes = (
+        Quote.objects
+        .select_related("client")
+        .order_by("created_at", "id")
     )
 
-    json_bytes = output.getvalue().encode("utf-8")
-    compressed_backup = gzip.compress(json_bytes, compresslevel=9)
+    try:
+        excel_file = generate_quotes_excel_report(
+            quotes=quotes,
+        )
+    except (FileNotFoundError, ValueError) as error:
+        messages.error(
+            request,
+            str(error),
+        )
+        return redirect("quote_list")
 
-    backup_date = timezone.localdate().strftime("%Y-%m-%d")
-    filename = f"firequote_backup_{backup_date}.json.gz"
+    except Exception as error:
+        print("EXCEL REPORT ERROR:", repr(error))
+
+        messages.error(
+            request,
+            f"No fue posible generar el reporte: {error}"
+        )
+
+        return redirect("quote_list")
+    # except Exception:
+    #     messages.error(
+    #         request,
+    #         "No fue posible generar el reporte de cotizaciones."
+    #     )
+    #     return redirect("quote_list")
+
+    filename = "Seguimiento a cotizaciones.xlsx"
 
     response = HttpResponse(
-        compressed_backup,
-        content_type="application/gzip",
+        excel_file.getvalue(),
+        content_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        ),
     )
 
     response["Content-Disposition"] = (
@@ -987,3 +1026,73 @@ def download_backup(request):
     )
 
     return response
+
+@login_required
+@user_passes_test(can_download_backup)
+def download_backup(request):
+    """
+    Genera un respaldo comprimido sin mantener todo el JSON
+    simultáneamente en la memoria del servidor.
+    """
+    try:
+        # Mantiene archivos pequeños en memoria y mueve los grandes
+        # automáticamente a un archivo temporal en disco.
+        backup_file = tempfile.SpooledTemporaryFile(
+            max_size=5 * 1024 * 1024,
+            mode="w+b",
+        )
+
+        # Gzip escribe la información comprimida progresivamente.
+        with gzip.GzipFile(
+            fileobj=backup_file,
+            mode="wb",
+            compresslevel=5,
+        ) as gzip_file:
+
+            # dumpdata escribe texto, por eso envolvemos gzip
+            # en un stream de texto UTF-8.
+            with TextIOWrapper(
+                gzip_file,
+                encoding="utf-8",
+                write_through=True,
+            ) as text_output:
+
+                call_command(
+                    "dumpdata",
+                    "quotes.client",
+                    "quotes.quote",
+                    "quotes.norm",
+                    "quotes.templatedoc",
+                    "quotes.quotecounter",
+                    indent=2,
+                    stdout=text_output,
+                )
+
+        backup_file.seek(0)
+
+        backup_date = timezone.localdate().strftime(
+            "%Y-%m-%d"
+        )
+
+        filename = (
+            f"firequote_backup_{backup_date}.json.gz"
+        )
+
+        return FileResponse(
+            backup_file,
+            as_attachment=True,
+            filename=filename,
+            content_type="application/gzip",
+        )
+
+    except Exception as error:
+        logger.exception(
+            "Error generating FireQuote backup"
+        )
+
+        messages.error(
+            request,
+            f"No fue posible generar el respaldo: {error}",
+        )
+
+        return redirect("home")
